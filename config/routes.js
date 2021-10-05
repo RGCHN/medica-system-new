@@ -1,5 +1,3 @@
-import {AreaChartOutlined} from "@ant-design/icons";
-
 export default [
   {
     path: '/user',
@@ -23,7 +21,7 @@ export default [
   {
     path: '/welcome',
     name: 'welcome',
-    icon: <AreaChartOutlined />,
+    icon: 'smile',
     component: './Welcome',
   },
   {
