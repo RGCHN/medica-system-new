@@ -1,12 +1,12 @@
 const Settings = {
   navTheme: 'light',
-  // 拂晓蓝
-  primaryColor: '#2F54EB',
-  layout: 'mix',
+  primaryColor: "#722ED1",
+  layout: 'side',
   contentWidth: 'Fluid',
   fixedHeader: false,
   fixSiderbar: true,
   colorWeak: false,
+  splitMenus: false,
   title: '脑卒中辅助诊疗系统',
   pwa: false,
   iconfontUrl: '',

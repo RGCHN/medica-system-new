@@ -87,11 +87,7 @@ const Login = () => {
               <span className={styles.title}>脑卒中辅助诊疗系统</span>
             </Link>
           </div>
-          <div className={styles.desc}>
-            {intl.formatMessage({
-              id: 'pages.layouts.userLayout.title',
-            })}
-          </div>
+          <div className={styles.desc} />
         </div>
 
         <div className={styles.main}>
@@ -190,7 +186,7 @@ const Login = () => {
                   float: 'right',
                 }}
               >
-                <FormattedMessage id="pages.login.forgotPassword" defaultMessage="忘记密码" />
+                <FormattedMessage id="pages.login.registerAccount" defaultMessage="注册账号" />
               </a>
             </div>
           </ProForm>
