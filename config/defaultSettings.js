@@ -7,7 +7,7 @@ const Settings = {
   fixSiderbar: true,
   colorWeak: false,
   splitMenus: false,
-  title: '脑卒中辅助诊疗系统',
+  title: '脑卒中AI助诊',
   pwa: false,
   iconfontUrl: '',
 };

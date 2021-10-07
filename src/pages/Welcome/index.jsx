@@ -252,7 +252,7 @@ export default () => {
                 interactions={[{ type: 'element-active' }]}
               />
             </Card>
-          </Col>V
+          </Col>
         </Row>
         <br />
         <Row gutter={4}>

@@ -42,6 +42,8 @@ export async function getInitialState() {
 
 export const layout = ({ initialState }) => {
   return {
+    title: '脑卒中AI助诊',
+    logo: '',
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
     waterMarkProps: {

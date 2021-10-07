@@ -1,401 +1,275 @@
-import { PlusOutlined } from '@ant-design/icons';
-import { Button, message, Input, Drawer } from 'antd';
-import React, { useState, useRef } from 'react';
-import { useIntl, FormattedMessage } from 'umi';
-import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
-import ProTable from '@ant-design/pro-table';
-import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
-import ProDescriptions from '@ant-design/pro-descriptions';
-import UpdateForm from './components/UpdateForm';
-import { rule, addRule, updateRule, removeRule } from '@/services/ant-design-pro/api';
-/**
- * @en-US Add node
- * @zh-CN 添加节点
- * @param fields
- */
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { PageContainer } from '@ant-design/pro-layout';
+import { Table, Space, Radio, Tag, Button, Input, Spin } from 'antd';
+import { NavLink } from '@umijs/preset-dumi/lib/theme';
 
-const handleAdd = async (fields) => {
-  const hide = message.loading('正在添加');
 
-  try {
-    await addRule({ ...fields });
-    hide();
-    message.success('Added successfully');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Adding failed, please try again!');
-    return false;
-  }
-};
-/**
- * @en-US Update node
- * @zh-CN 更新节点
- *
- * @param fields
- */
+/*mock数据*/
+const stateMap = {
+  "1": "0-6小时",
+  "2": "6-24小时",
+  "3": "24小时-2周",
+  "4": "大于2周",
+}
+export const userTypeMap = {
+  "1": "管理员",
+  "2": "主任医生",
+  "3": "医生",
+}
 
-const handleUpdate = async (fields) => {
-  const hide = message.loading('Configuring');
+const DEFAULT_DATA = [
+  {
+    key:'1',
+    id: '1',
+    recordID:'1111',
+    doctor:'张伟华医师',
+    name: '李兵',
+    sex:'男',
+    age: 32,
+    cva: '出血性脑梗塞',
+    state: '1',
+    updateTime: '2020-9-11',
+  },
+  {
+    key:'2',
+    id: '2',
+    recordID:'2222',
+    doctor:'张伟华医师',
+    name: '林硕',
+    sex:'男',
+    cva: '缺血性脑梗塞',
+    age: 18,
+    state: '2',
+    updateTime: '2020-01-15',
+  },
+  {
+    key:'3',
+    id: '3',
+    recordID:'3333',
+    doctor:'王业医师',
+    name: '刘雯',
+    sex:'女',
+    age: 55,
+    cva: '缺血性脑梗塞',
+    state: '3',
+    updateTime: '2020-05-23',
+  },
+  {
+    key:'4',
+    id: '4',
+    recordID:'4444',
+    doctor:'李涛医师',
+    sex:'女',
+    name: '吴芬婷',
+    age: 82,
+    cva: '出血性脑梗塞',
+    state: '4',
+    updateTime: '2019-12-27',
+  },
+];
+const listColumns = [
+  {
+    title: '病例编号',
+    dataIndex: 'id',
+    key: 'id',
+    ellipsis: true,
+    width:100
+  },
+  {
+    title: '姓名',
+    dataIndex: 'name',
+    key: 'name',
+    ellipsis: true,
+    width:100
+  },
+  {
+    title: '性别',
+    dataIndex: 'sex',
+    key: 'sex',
+    ellipsis: true,
+    width:60
+  },
+  {
+    title: '年龄',
+    dataIndex: 'age',
+    key: 'age',
+    ellipsis: true,
+    width:60
+  },
+  {
+    title: '脑卒中分类',
+    dataIndex: 'cva',
+    key: 'cva',
+    ellipsis: true,
+    width: 140,
+    render: cva => {
+      let color = 'geekblue';
+      if (cva === '出血性脑梗塞') {
+        color = 'green';
+      }
+      return (
+        <Tag color={color} key={cva}>
+          {cva}
+        </Tag>
+      );
+    },
+  },
 
-  try {
-    await updateRule({
-      name: fields.name,
-      desc: fields.desc,
-      key: fields.key,
-    });
-    hide();
-    message.success('Configuration is successful');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Configuration failed, please try again!');
-    return false;
-  }
-};
-/**
- *  Delete node
- * @zh-CN 删除节点
- *
- * @param selectedRows
- */
+  {
+    title: '脑损伤阶段',
+    dataIndex: 'state',
+    key: 'state',
+    ellipsis: true,
+    render: state => {
+      return (
+        <span>{stateMap[state]}</span>
+      )
+    },
+  },
+  {
+    title: '负责医师',
+    dataIndex: 'doctor',
+    key: 'doctor',
+    ellipsis: true,
+    width:120
+  },
+  {
+    title: '就诊卡号/医保号',
+    dataIndex: 'recordID',
+    key: 'recordID',
+    ellipsis: true,
 
-const handleRemove = async (selectedRows) => {
-  const hide = message.loading('正在删除');
-  if (!selectedRows) return true;
+  },
+  {
+    title: '最近更新时间',
+    dataIndex: 'updateTime',
+    key: 'updateTime',
+    ellipsis: true,
+  },
+];
+const operatorColumns = [
+  {
+    title: '病例编号',
+    dataIndex: 'recordID',
+    key: 'recordID',
+    ellipsis: true,
+    width:100
+  },
+  {
+    title: '姓名',
+    dataIndex: 'name',
+    key: 'name',
+    ellipsis: true,
+    width:100
+  },
+  {
+    title: '性别',
+    dataIndex: 'sex',
+    key: 'sex',
+    ellipsis: true,
+    width:60,
+    render: sex => {
+      if (sex.toString() === '0') {
+        return (
+          <span>男</span>
+        )
+      } else {
+        return (
+          <span>女</span>
+        )
+      }
+    }
+  },
+  {
+    title: '年龄',
+    dataIndex: 'age',
+    key: 'age',
+    ellipsis: true,
+    width:60
+  },
+  {
+    title: '脑卒中分类',
+    dataIndex: 'cva',
+    key: 'cva',
+    ellipsis: true,
+    width: 140,
+    render: cva => {
+      let color = 'geekblue';
+      if (cva === "in") {
+        color = 'green';
+      }
+      return (
+        <Tag color={color} key={cva}>
+          {cva === "in" ? "缺血性脑梗塞" : "出血性脑梗塞"}
+        </Tag>
+      );
+    },
+  },
 
-  try {
-    await removeRule({
-      key: selectedRows.map((row) => row.key),
-    });
-    hide();
-    message.success('Deleted successfully and will refresh soon');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Delete failed, please try again');
-    return false;
-  }
-};
+  {
+    title: '脑损伤阶段',
+    dataIndex: 'state',
+    key: 'state',
+    ellipsis: true,
+    render: state => {
+      return (
+        <span>{stateMap[state]}</span>
+      )
+    },
+  },
+  {
+    title: '负责医师',
+    dataIndex: 'doctor',
+    key: 'doctor',
+    ellipsis: true,
+    width:120
+  },
+  {
+    title: '操作',
+    dataIndex: 'id',
+    key: 'action',
+    render: id => (
+      <Space size="middle">
+        <Button>
+          <NavLink to={`/patientInfo/basic/${id}/edit`}>编辑</NavLink>
+        </Button>
+      </Space>
+    ),
+  },
+];
 
 const TableList = () => {
-  /**
-   * @en-US Pop-up window of new window
-   * @zh-CN 新建窗口的弹窗
-   *  */
-  const [createModalVisible, handleModalVisible] = useState(false);
-  /**
-   * @en-US The pop-up window of the distribution update window
-   * @zh-CN 分布更新窗口的弹窗
-   * */
+  const [ patientData, setPatientData] = useState([]);
 
-  const [updateModalVisible, handleUpdateModalVisible] = useState(false);
-  const [showDetail, setShowDetail] = useState(false);
-  const actionRef = useRef();
-  const [currentRow, setCurrentRow] = useState();
-  const [selectedRowsState, setSelectedRows] = useState([]);
-  /**
-   * @en-US International configuration
-   * @zh-CN 国际化配置
-   * */
+  const rowSelection = {
+    onChange: (selectedRowKeys, selectedRows) => {
+      console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+    },
+    getCheckboxProps: record => ({
+      disabled: record.name === 'Disabled User',
+      name: record.name,
+    }),
+  };
 
-  const intl = useIntl();
-  const columns = [
-    {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.updateForm.ruleName.nameLabel"
-          defaultMessage="Rule name"
-        />
-      ),
-      dataIndex: 'name',
-      tip: 'The rule name is the unique key',
-      render: (dom, entity) => {
-        return (
-          <a
-            onClick={() => {
-              setCurrentRow(entity);
-              setShowDetail(true);
-            }}
-          >
-            {dom}
-          </a>
-        );
-      },
-    },
-    {
-      title: <FormattedMessage id="pages.searchTable.titleDesc" defaultMessage="Description" />,
-      dataIndex: 'desc',
-      valueType: 'textarea',
-    },
-    {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.titleCallNo"
-          defaultMessage="Number of service calls"
-        />
-      ),
-      dataIndex: 'callNo',
-      sorter: true,
-      hideInForm: true,
-      renderText: (val) =>
-        `${val}${intl.formatMessage({
-          id: 'pages.searchTable.tenThousand',
-          defaultMessage: ' 万 ',
-        })}`,
-    },
-    {
-      title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
-      dataIndex: 'status',
-      hideInForm: true,
-      valueEnum: {
-        0: {
-          text: (
-            <FormattedMessage
-              id="pages.searchTable.nameStatus.default"
-              defaultMessage="Shut down"
-            />
-          ),
-          status: 'Default',
-        },
-        1: {
-          text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.running" defaultMessage="Running" />
-          ),
-          status: 'Processing',
-        },
-        2: {
-          text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.online" defaultMessage="Online" />
-          ),
-          status: 'Success',
-        },
-        3: {
-          text: (
-            <FormattedMessage
-              id="pages.searchTable.nameStatus.abnormal"
-              defaultMessage="Abnormal"
-            />
-          ),
-          status: 'Error',
-        },
-      },
-    },
-    {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.titleUpdatedAt"
-          defaultMessage="Last scheduled time"
-        />
-      ),
-      sorter: true,
-      dataIndex: 'updatedAt',
-      valueType: 'dateTime',
-      renderFormItem: (item, { defaultRender, ...rest }, form) => {
-        const status = form.getFieldValue('status');
+  useEffect(() => {
+    setPatientData(DEFAULT_DATA)
+  }, [])
 
-        if (`${status}` === '0') {
-          return false;
-        }
+  const handleChange = useCallback(() => {
 
-        if (`${status}` === '3') {
-          return (
-            <Input
-              {...rest}
-              placeholder={intl.formatMessage({
-                id: 'pages.searchTable.exception',
-                defaultMessage: 'Please enter the reason for the exception!',
-              })}
-            />
-          );
-        }
+  }, [])
 
-        return defaultRender(item);
-      },
-    },
-    {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
-      dataIndex: 'option',
-      valueType: 'option',
-      render: (_, record) => [
-        <a
-          key="config"
-          onClick={() => {
-            handleUpdateModalVisible(true);
-            setCurrentRow(record);
-          }}
-        >
-          <FormattedMessage id="pages.searchTable.config" defaultMessage="Configuration" />
-        </a>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          <FormattedMessage
-            id="pages.searchTable.subscribeAlert"
-            defaultMessage="Subscribe to alerts"
-          />
-        </a>,
-      ],
-    },
-  ];
   return (
     <PageContainer>
-      <ProTable
-        headerTitle={intl.formatMessage({
-          id: 'pages.searchTable.title',
-          defaultMessage: 'Enquiry form',
-        })}
-        actionRef={actionRef}
-        rowKey="key"
-        search={{
-          labelWidth: 120,
-        }}
-        toolBarRender={() => [
-          <Button
-            type="primary"
-            key="primary"
-            onClick={() => {
-              handleModalVisible(true);
-            }}
-          >
-            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
-          </Button>,
-        ]}
-        request={rule}
-        columns={columns}
+      <Table
         rowSelection={{
-          onChange: (_, selectedRows) => {
-            setSelectedRows(selectedRows);
-          },
+          type: null,
+          ...rowSelection,
         }}
-      />
-      {selectedRowsState?.length > 0 && (
-        <FooterToolbar
-          extra={
-            <div>
-              <FormattedMessage id="pages.searchTable.chosen" defaultMessage="Chosen" />{' '}
-              <a
-                style={{
-                  fontWeight: 600,
-                }}
-              >
-                {selectedRowsState.length}
-              </a>{' '}
-              <FormattedMessage id="pages.searchTable.item" defaultMessage="项" />
-              &nbsp;&nbsp;
-              <span>
-                <FormattedMessage
-                  id="pages.searchTable.totalServiceCalls"
-                  defaultMessage="Total number of service calls"
-                />{' '}
-                {selectedRowsState.reduce((pre, item) => pre + item.callNo, 0)}{' '}
-                <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万" />
-              </span>
-            </div>
-          }
-        >
-          <Button
-            onClick={async () => {
-              await handleRemove(selectedRowsState);
-              setSelectedRows([]);
-              actionRef.current?.reloadAndRest?.();
-            }}
-          >
-            <FormattedMessage
-              id="pages.searchTable.batchDeletion"
-              defaultMessage="Batch deletion"
-            />
-          </Button>
-          <Button type="primary">
-            <FormattedMessage
-              id="pages.searchTable.batchApproval"
-              defaultMessage="Batch approval"
-            />
-          </Button>
-        </FooterToolbar>
-      )}
-      <ModalForm
-        title={intl.formatMessage({
-          id: 'pages.searchTable.createForm.newRule',
-          defaultMessage: 'New rule',
-        })}
-        width="400px"
-        visible={createModalVisible}
-        onVisibleChange={handleModalVisible}
-        onFinish={async (value) => {
-          const success = await handleAdd(value);
-
-          if (success) {
-            handleModalVisible(false);
-
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
-      >
-        <ProFormText
-          rules={[
-            {
-              required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.ruleName"
-                  defaultMessage="Rule name is required"
-                />
-              ),
-            },
-          ]}
-          width="md"
-          name="name"
-        />
-        <ProFormTextArea width="md" name="desc" />
-      </ModalForm>
-      <UpdateForm
-        onSubmit={async (value) => {
-          const success = await handleUpdate(value);
-
-          if (success) {
-            handleUpdateModalVisible(false);
-            setCurrentRow(undefined);
-
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
-        onCancel={() => {
-          handleUpdateModalVisible(false);
-
-          if (!showDetail) {
-            setCurrentRow(undefined);
-          }
-        }}
-        updateModalVisible={updateModalVisible}
-        values={currentRow || {}}
-      />
-
-      <Drawer
-        width={600}
-        visible={showDetail}
-        onClose={() => {
-          setCurrentRow(undefined);
-          setShowDetail(false);
-        }}
-        closable={false}
-      >
-        {currentRow?.name && (
-          <ProDescriptions
-            column={2}
-            title={currentRow?.name}
-            request={async () => ({
-              data: currentRow || {},
-            })}
-            params={{
-              id: currentRow?.name,
-            }}
-            columns={columns}
-          />
-        )}
-      </Drawer>
+        columns={ listColumns}
+        dataSource={patientData}
+        onChange={handleChange}
+        pagination = {{position:['bottomCenter']}}/>
     </PageContainer>
   );
 };
