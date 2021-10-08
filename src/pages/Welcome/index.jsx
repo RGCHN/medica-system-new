@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { PageContainer } from '@ant-design/pro-layout';
 import { Card, Typography, Col, Row, Space } from 'antd';
 import { Pie, Column, Gauge, Rose, Line} from '@ant-design/charts'
-
+import { dayMap } from '@/pages/dataMap';
 import styles from './index.less';
 
 const { Title } = Typography;
@@ -115,7 +115,8 @@ const admittedData = [
 ]
 
 export default () => {
-  const dateNow = useRef(dayjs().format('YYYY-MM-DD HH:mm'));
+  const dateNow = useRef('');
+  const day = useRef('');
   const [gender, setGender] = useState([]);
   const [ages, setAges] = useState([]);
   const [distribute, setDistribute] = useState([]);
@@ -123,6 +124,10 @@ export default () => {
   const [cureRate, setCureRate] = useState( Math.random());
 
   useEffect(() => {
+    /*设置日期*/
+    const now  = dayjs();
+    dateNow.current = now.format('YYYY-MM-DD HH:mm');
+    day.current = dayMap[now.day()];
     setGender(genderData);
     setAges(ageData);
     setDistribute(distributeData);
@@ -132,7 +137,7 @@ export default () => {
   return (
     <PageContainer>
       <Card>
-        <Title level={5}>现在是 北京时间  {dateNow.current}</Title>
+        <Title level={5}>现在是 北京时间  { dateNow.current }, 星期{day.current}</Title>
       </Card>
       <br />
       <div className={styles.cardWrapper}>

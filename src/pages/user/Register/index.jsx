@@ -4,8 +4,8 @@ import {
 } from '@ant-design/icons';
 import { Alert, message } from 'antd';
 import React, { useState } from 'react';
-import ProForm, {  ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
-import { useIntl, Link, history, FormattedMessage, SelectLang, useModel, NavLink } from 'umi';
+import ProForm, {  ProFormText } from '@ant-design/pro-form';
+import { useIntl, NavLink, Link, history, FormattedMessage, SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
 import { login } from '@/services/ant-design-pro/api';
 import logo from '../../assets/image/logo.svg';
@@ -22,7 +22,7 @@ const LoginMessage = ({ content }) => (
   />
 );
 
-const Login = () => {
+const Register = () => {
   const [submitting, setSubmitting] = useState(false);
   const [userLoginState, setUserLoginState] = useState({});
   const [type, setType] = useState('account');
@@ -88,6 +88,7 @@ const Login = () => {
           </div>
           <div className={styles.desc} />
         </div>
+
         <div className={styles.main}>
           <ProForm
             initialValues={{
@@ -96,8 +97,8 @@ const Login = () => {
             submitter={{
               searchConfig: {
                 submitText: intl.formatMessage({
-                  id: 'pages.login.submit',
-                  defaultMessage: '登录',
+                  id: 'pages.login.register',
+                  defaultMessage: '注册',
                 }),
               },
               render: (_, dom) => dom.pop(),
@@ -169,22 +170,17 @@ const Login = () => {
                 />
               </>
             )}
-
             <div
               style={{
-                marginBottom: 24,
+                paddingBottom: 48,
               }}
             >
-              <ProFormCheckbox noStyle name="autoLogin">
-                <FormattedMessage id="pages.login.rememberMe" defaultMessage="自动登录" />
-              </ProFormCheckbox>
               <NavLink
-                to='/user/Register'
                 style={{
                   float: 'right',
                 }}
-              >
-                <FormattedMessage id="pages.login.registerAccount" defaultMessage="注册账号" />
+               to='/user/Login'>
+                <FormattedMessage id="pages.login.loginAccount" defaultMessage="已有账号，去登录" />
               </NavLink>
             </div>
           </ProForm>
@@ -195,4 +191,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

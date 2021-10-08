@@ -3,7 +3,10 @@ import { history } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
+import logo from './pages/assets/image/logo.svg';
+
 const loginPath = '/user/login';
+const registerPath = '/user/register';
 /** 获取用户信息比较慢的时候会展示一个 loading */
 
 export const initialStateConfig = {
@@ -43,7 +46,7 @@ export async function getInitialState() {
 export const layout = ({ initialState }) => {
   return {
     title: '脑卒中AI助诊',
-    logo: '',
+    logo: logo,
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
     waterMarkProps: {
@@ -52,13 +55,11 @@ export const layout = ({ initialState }) => {
     footerRender: () => <Footer />,
     onPageChange: () => {
       const { location } = history; // 如果没有登录，重定向到 login
-
-      if (!initialState?.currentUser && location.pathname !== loginPath) {
+      if (!initialState?.currentUser && location.pathname !== loginPath && location.pathname !== registerPath) {
         history.push(loginPath);
       }
     },
     links: [],
-    menuHeaderRender: undefined,
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     ...initialState?.settings,

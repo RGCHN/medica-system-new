@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Table, Space, Radio, Tag, Button, Input, Spin } from 'antd';
+import { Table, Space, Radio, Tag, Button, Input, Spin, Dropdown } from 'antd';
 import { NavLink } from '@umijs/preset-dumi/lib/theme';
-
+import { PlusOutlined, EllipsisOutlined } from '@ant-design/icons';
+import ProTable, { TableDropdown } from '@ant-design/pro-table';
 
 /*mock数据*/
 const stateMap = {
@@ -78,6 +79,7 @@ const listColumns = [
   {
     title: '姓名',
     dataIndex: 'name',
+    copyable: true,
     key: 'name',
     ellipsis: true,
     width:100
@@ -87,7 +89,13 @@ const listColumns = [
     dataIndex: 'sex',
     key: 'sex',
     ellipsis: true,
-    width:60
+    width:60,
+    valueType: 'select',
+    valueEnum: {
+      all: { text: '全部', status: 'Default' },
+      male: { text: '男', status: '男'},
+      female: { text: '女', status: '女'}
+    }
   },
   {
     title: '年龄',
@@ -114,7 +122,6 @@ const listColumns = [
       );
     },
   },
-
   {
     title: '脑损伤阶段',
     dataIndex: 'state',
@@ -125,6 +132,14 @@ const listColumns = [
         <span>{stateMap[state]}</span>
       )
     },
+    valueType: 'select',
+    valueEnum: {
+      all: { text: '全部', status: 'Default' },
+      1: { text: '0-6小时', status: '1'},
+      2: { text: '6-24小时', status: '2'},
+      3: { text: '24小时-2周', status: '3'},
+      4: { text: '大于2周', status: '4'},
+    }
   },
   {
     title: '负责医师',
@@ -145,6 +160,8 @@ const listColumns = [
     dataIndex: 'updateTime',
     key: 'updateTime',
     ellipsis: true,
+    sorter: true,
+    hideInSearch: true,
   },
 ];
 const operatorColumns = [
@@ -240,7 +257,7 @@ const operatorColumns = [
 
 const TableList = () => {
   const [ patientData, setPatientData] = useState([]);
-
+  const actionRef = useRef();
   const rowSelection = {
     onChange: (selectedRowKeys, selectedRows) => {
       console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
@@ -261,7 +278,7 @@ const TableList = () => {
 
   return (
     <PageContainer>
-      <Table
+    {/*  <Table
         rowSelection={{
           type: null,
           ...rowSelection,
@@ -270,6 +287,42 @@ const TableList = () => {
         dataSource={patientData}
         onChange={handleChange}
         pagination = {{position:['bottomCenter']}}/>
+*/}
+      <ProTable
+        columns={listColumns}
+        actionRef={actionRef}
+        request={() => {
+          return patientData
+        }}
+        editable={{
+          type: 'multiple',
+        }}
+        columnsState={{
+          persistenceKey: 'pro-table-singe-demos',
+          persistenceType: 'localStorage',
+        }}
+        rowKey="id"
+        search={{
+          labelWidth: 'auto',
+        }}
+        form={{
+        // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
+        syncToUrl: (values, type) => {
+          if (type === 'get') {
+            return Object.assign(Object.assign({}, values), { created_at: [values.startTime, values.endTime] });
+          }
+          return values;
+        },
+      }}
+        pagination={{
+        pageSize: 5,
+      }}
+        dateFormatter="string"
+        toolBarRender={() => [
+        <Button key="button" icon={<PlusOutlined />} type="primary">
+          新建
+        </Button>
+      ]}/>
     </PageContainer>
   );
 };
