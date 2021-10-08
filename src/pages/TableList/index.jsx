@@ -1,22 +1,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Table, Space, Radio, Tag, Button, Input, Spin, Dropdown } from 'antd';
+import { Space, Tag, Button } from 'antd';
 import { NavLink } from '@umijs/preset-dumi/lib/theme';
-import { PlusOutlined, EllipsisOutlined } from '@ant-design/icons';
-import ProTable, { TableDropdown } from '@ant-design/pro-table';
-
-/*mock数据*/
-const stateMap = {
-  "1": "0-6小时",
-  "2": "6-24小时",
-  "3": "24小时-2周",
-  "4": "大于2周",
-}
-export const userTypeMap = {
-  "1": "管理员",
-  "2": "主任医生",
-  "3": "医生",
-}
+import { PlusOutlined } from '@ant-design/icons';
+import ProTable from '@ant-design/pro-table';
+import { stateMap } from '../dataMap';
 
 const DEFAULT_DATA = [
   {
@@ -73,6 +61,7 @@ const listColumns = [
     title: '病例编号',
     dataIndex: 'id',
     key: 'id',
+    copyable: true,
     ellipsis: true,
     width:100
   },
@@ -90,6 +79,7 @@ const listColumns = [
     key: 'sex',
     ellipsis: true,
     width:60,
+    filters: true,
     valueType: 'select',
     valueEnum: {
       all: { text: '全部', status: 'Default' },
@@ -110,7 +100,8 @@ const listColumns = [
     key: 'cva',
     ellipsis: true,
     width: 140,
-    render: cva => {
+    render: (val, record) => {
+      const cva = record.cva;
       let color = 'geekblue';
       if (cva === '出血性脑梗塞') {
         color = 'green';
@@ -120,25 +111,25 @@ const listColumns = [
           {cva}
         </Tag>
       );
-    },
+    }
   },
   {
     title: '脑损伤阶段',
     dataIndex: 'state',
     key: 'state',
     ellipsis: true,
-    render: state => {
+    render: (_, record) => {
+      const state = record.state;
       return (
         <span>{stateMap[state]}</span>
       )
     },
-    valueType: 'select',
     valueEnum: {
       all: { text: '全部', status: 'Default' },
-      1: { text: '0-6小时', status: '1'},
-      2: { text: '6-24小时', status: '2'},
-      3: { text: '24小时-2周', status: '3'},
-      4: { text: '大于2周', status: '4'},
+      '1': { text: '0-6小时', status: 'Error'},
+      '2': { text: '6-24小时', status: 'Success'},
+      '3': { text: '24小时-2周', status: 'Processing'},
+      '4': { text: '大于2周', status: 'Default'},
     }
   },
   {
@@ -153,7 +144,7 @@ const listColumns = [
     dataIndex: 'recordID',
     key: 'recordID',
     ellipsis: true,
-
+    copyable: true,
   },
   {
     title: '最近更新时间',
@@ -162,6 +153,18 @@ const listColumns = [
     ellipsis: true,
     sorter: true,
     hideInSearch: true,
+  },
+  {
+    title: '操作',
+    dataIndex: 'id',
+    key: 'action',
+    render: id => (
+      <Space size="middle">
+        <Button>
+          <NavLink to={`/patientInfo/basic/${id}/edit`}>查看</NavLink>
+        </Button>
+      </Space>
+    ),
   },
 ];
 const operatorColumns = [
@@ -278,24 +281,14 @@ const TableList = () => {
 
   return (
     <PageContainer>
-    {/*  <Table
-        rowSelection={{
-          type: null,
-          ...rowSelection,
-        }}
-        columns={ listColumns}
-        dataSource={patientData}
-        onChange={handleChange}
-        pagination = {{position:['bottomCenter']}}/>
-*/}
       <ProTable
         columns={listColumns}
         actionRef={actionRef}
         request={() => {
-          return patientData
-        }}
-        editable={{
-          type: 'multiple',
+          return Promise.resolve({
+            data: patientData,
+            success: true
+          })
         }}
         columnsState={{
           persistenceKey: 'pro-table-singe-demos',
@@ -307,22 +300,29 @@ const TableList = () => {
         }}
         form={{
         // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
-        syncToUrl: (values, type) => {
-          if (type === 'get') {
-            return Object.assign(Object.assign({}, values), { created_at: [values.startTime, values.endTime] });
+          syncToUrl: (values, type) => {
+            if (type === 'get') {
+              return Object.assign(Object.assign({}, values), { created_at: [values.startTime, values.endTime] });
+           }
+            return values;
           }
-          return values;
-        },
-      }}
+        }}
         pagination={{
-        pageSize: 5,
-      }}
+          pageSize: 5,
+        }}
         dateFormatter="string"
         toolBarRender={() => [
-        <Button key="button" icon={<PlusOutlined />} type="primary">
-          新建
-        </Button>
-      ]}/>
+          <Button key="button" icon={<PlusOutlined />} type="primary">
+            新建
+         </Button>
+        ]}
+        options={{
+          show: true,
+          density: false,
+          fullScreen: true,
+          setting: true,
+        }}
+      />
     </PageContainer>
   );
 };

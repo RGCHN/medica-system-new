@@ -30,15 +30,30 @@ export default [
     component: './Welcome',
   },
   {
-    path: '/admin',
-    name: 'admin',
+    name: 'list.table-list',
+    icon: 'table',
+    path: '/list',
+    component: './TableList',
+  },
+  {
+    path: '/manage',
+    name: 'manage',
     icon: 'crown',
-    access: 'canAdmin',
-    component: './Admin',
+    component: './PatientManage',
     routes: [
       {
-        path: '/admin/sub-page',
-        name: 'sub-page',
+        path: '/manage/message',
+        name: 'message',
+        icon: 'smile',
+        component: './Welcome',
+      },{
+        path: '/manage/image',
+        name: 'image',
+        icon: 'smile',
+        component: './Welcome',
+      },{
+        path: '/manage/predict',
+        name: 'predict',
         icon: 'smile',
         component: './Welcome',
       },
@@ -46,12 +61,6 @@ export default [
         component: './404',
       },
     ],
-  },
-  {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
   },
   {
     path: '/',
