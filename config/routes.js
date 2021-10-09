@@ -26,7 +26,7 @@ export default [
   {
     path: '/welcome',
     name: 'welcome',
-    icon: 'smile',
+    icon: 'areaChart',
     component: './Welcome',
   },
   {
@@ -38,24 +38,23 @@ export default [
   {
     path: '/manage',
     name: 'manage',
-    icon: 'crown',
-    component: './PatientManage',
+    icon: 'team',
+    component: './Patient',
     routes: [
       {
         path: '/manage/message',
         name: 'message',
-        icon: 'smile',
-        component: './Welcome',
-      },{
+        component: './PatientManage',
+      },
+      {
         path: '/manage/image',
         name: 'image',
-        icon: 'smile',
-        component: './Welcome',
-      },{
+        component: './ImageManage',
+      },
+      {
         path: '/manage/predict',
         name: 'predict',
-        icon: 'smile',
-        component: './Welcome',
+        component: './ModelPredict',
       },
       {
         component: './404',

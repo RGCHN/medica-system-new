@@ -95,25 +95,6 @@ const listColumns = [
     width:60
   },
   {
-    title: '脑卒中分类',
-    dataIndex: 'cva',
-    key: 'cva',
-    ellipsis: true,
-    width: 140,
-    render: (val, record) => {
-      const cva = record.cva;
-      let color = 'geekblue';
-      if (cva === '出血性脑梗塞') {
-        color = 'green';
-      }
-      return (
-        <Tag color={color} key={cva}>
-          {cva}
-        </Tag>
-      );
-    }
-  },
-  {
     title: '脑损伤阶段',
     dataIndex: 'state',
     key: 'state',
@@ -140,7 +121,7 @@ const listColumns = [
     width:120
   },
   {
-    title: '就诊卡号/医保号',
+    title: '病案号',
     dataIndex: 'recordID',
     key: 'recordID',
     ellipsis: true,
@@ -169,7 +150,7 @@ const listColumns = [
 ];
 const operatorColumns = [
   {
-    title: '病例编号',
+    title: '病案号',
     dataIndex: 'recordID',
     key: 'recordID',
     ellipsis: true,
@@ -207,25 +188,6 @@ const operatorColumns = [
     ellipsis: true,
     width:60
   },
-  {
-    title: '脑卒中分类',
-    dataIndex: 'cva',
-    key: 'cva',
-    ellipsis: true,
-    width: 140,
-    render: cva => {
-      let color = 'geekblue';
-      if (cva === "in") {
-        color = 'green';
-      }
-      return (
-        <Tag color={color} key={cva}>
-          {cva === "in" ? "缺血性脑梗塞" : "出血性脑梗塞"}
-        </Tag>
-      );
-    },
-  },
-
   {
     title: '脑损伤阶段',
     dataIndex: 'state',
@@ -314,7 +276,10 @@ const TableList = () => {
         toolBarRender={() => [
           <Button key="button" icon={<PlusOutlined />} type="primary">
             新建
-         </Button>
+         </Button>,
+          <Button key="out">
+            导出数据
+          </Button>,
         ]}
         options={{
           show: true,
