@@ -4,7 +4,7 @@ export default {
   'menu.home': 'ホーム',
   'menu.manage': '病人管理',
   'menu.manage.message': '基本情報',
-  'menu.manage.image': '画像管理',
+  'menu.manage.image': '歴史記録',
   'menu.manage.predict': 'モデル予測',
   'menu.login': 'ログイン',
   'menu.register': '登録',

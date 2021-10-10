@@ -4,7 +4,7 @@ export default {
   'menu.home': '首页',
   'menu.manage': '病人管理',
   'menu.manage.message': '基本信息',
-  'menu.manage.image': '影像管理',
+  'menu.manage.image': '历史记录',
   'menu.manage.predict': '模型预测',
   'menu.manage.sub-page': '二级管理页',
   'menu.login': '登录',

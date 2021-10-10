@@ -47,14 +47,14 @@ export default [
         component: './PatientManage',
       },
       {
-        path: '/manage/image',
-        name: 'image',
-        component: './ImageManage',
-      },
-      {
         path: '/manage/predict',
         name: 'predict',
         component: './ModelPredict',
+      },
+      {
+        path: '/manage/image',
+        name: 'image',
+        component: './HistoryManage',
       },
       {
         component: './404',

@@ -5,7 +5,7 @@ export default {
   'menu.login': '登錄',
   'menu.manage': '患者管理',
   'menu.manage.message': '基本信息',
-  'menu.manage.image': '影像管理',
+  'menu.manage.image': '歷史記錄',
   'menu.manage.predict': '模型預測',
   'menu.exception.403': '403',
   'menu.exception.404': '404',
