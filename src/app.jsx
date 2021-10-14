@@ -2,46 +2,19 @@ import { PageLoading } from '@ant-design/pro-layout';
 import { history } from 'umi';
 import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
-import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
 import logo from './pages/assets/image/logo.svg';
-
 const loginPath = '/user/login';
 const registerPath = '/user/Register';
-/** 获取用户信息比较慢的时候会展示一个 loading */
 
 export const initialStateConfig = {
   loading: <PageLoading />,
 };
-/**
- * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
- * */
 
 export async function getInitialState() {
-  const fetchUserInfo = async () => {
-    try {
-      const msg = await queryCurrentUser();
-      return msg.data;
-    } catch (error) {
-      history.push(loginPath);
-    }
-
-    return undefined;
-  }; // 如果是登录页面，不执行
-
-  if (history.location.pathname !== loginPath) {
-    const currentUser = await fetchUserInfo();
-    return {
-      fetchUserInfo,
-      currentUser,
-      settings: {},
-    };
-  }
-
   return {
-    fetchUserInfo,
-    settings: {},
-  };
-} // ProLayout 支持的api https://procomponents.ant.design/components/layout
+    userName: 'xxx'
+  }
+}
 
 export const layout = ({ initialState }) => {
   return {
@@ -50,12 +23,14 @@ export const layout = ({ initialState }) => {
     rightContentRender: () => <RightContent />,
     disableContentMargin: false,
     waterMarkProps: {
-      content: initialState?.currentUser?.name,
+      content: localStorage.getItem('currentUser')
     },
     footerRender: () => <Footer />,
     onPageChange: () => {
-      const { location } = history; // 如果没有登录，重定向到 login
-      if (!initialState?.currentUser && location.pathname !== loginPath && location.pathname !== registerPath) {
+      const currentUser = localStorage.getItem('currentUser');
+      console.log(currentUser);
+      const { location } = history;
+      if ( !currentUser && location.pathname !== loginPath && location.pathname !== registerPath) {
         history.push(loginPath);
       }
     },

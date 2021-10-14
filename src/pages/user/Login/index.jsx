@@ -3,13 +3,15 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { Alert, message } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ProForm, {  ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
-import { useIntl, Link, history, FormattedMessage, SelectLang, useModel, NavLink } from 'umi';
+import { useIntl, Link, history, FormattedMessage, SelectLang, NavLink, useModel } from 'umi';
+
 import Footer from '@/components/Footer';
-import { login } from '@/services/ant-design-pro/api';
+import { login } from '@/services/api';
 import logo from '../../assets/image/logo.svg';
 import styles from './index.less';
+import { getInitialState } from '@/app';
 
 const LoginMessage = ({ content }) => (
   <Alert
@@ -25,54 +27,54 @@ const LoginMessage = ({ content }) => (
 const Login = () => {
   const [submitting, setSubmitting] = useState(false);
   const [userLoginState, setUserLoginState] = useState({});
-  const [type, setType] = useState('account');
-  const { initialState, setInitialState } = useModel('@@initialState');
+  const [defaultUsername, setDefaultUsername] = useState('');
+  const { setInitialState, initialState  } = useModel('@@initialState');
+  const { setUser, getUser } = useModel('user');
+
   const intl = useIntl();
-
-  const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-
-    if (userInfo) {
-      await setInitialState((s) => ({ ...s, currentUser: userInfo }));
-    }
-  };
 
   const handleSubmit = async (values) => {
     setSubmitting(true);
-
+    console.log(initialState);
     try {
       // 登录
-      const msg = await login({ ...values, type });
-
-      if (msg.status === 'ok') {
+      const msg = await login({ ...values });
+      if (msg.data.status === 'success') {
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
           defaultMessage: '登录成功！',
         });
         message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
-        /** 此方法会跳转到 redirect 参数所在的位置 */
+        setUser({
+          username: msg.data.username,
+        })
+        history.push('/welcome');
+        localStorage.setItem('currentUser', msg.data.username);
+        localStorage.setItem('access_token', msg.data.data.access_token);
+        localStorage.setItem('refresh_token', msg.data.data.refresh_token);
+        return ;
+      }
 
-        if (!history) return;
-        const { query } = history.location;
-        const { redirect } = query;
-        history.push(redirect || '/');
-        return;
-      } // 如果失败去设置用户错误信息
-
+      message.error(msg.data.msg);
       setUserLoginState(msg);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
-        id: 'pages.login.failure',
-        defaultMessage: '登录失败，请重试！',
+        id: 'pages.login.accountLogin.errorMessage',
+        defaultMessage: '错误的用户名或密码！',
       });
       message.error(defaultLoginFailureMessage);
     }
-
     setSubmitting(false);
   };
 
-  const { status, type: loginType } = userLoginState;
+  useEffect(() => {
+    const user = getUser();
+    if (user && user.username) {
+      setDefaultUsername(user.username);
+    }
+  }, [])
+
+  const { status } = userLoginState;
   return (
     <div className={styles.container}>
       <div className={styles.lang} data-lang>
@@ -91,6 +93,7 @@ const Login = () => {
         <div className={styles.main}>
           <ProForm
             initialValues={{
+              username: defaultUsername,
               autoLogin: true,
             }}
             submitter={{
@@ -109,11 +112,9 @@ const Login = () => {
                 },
               },
             }}
-            onFinish={async (values) => {
-              await handleSubmit(values);
-            }}
+            onFinish={handleSubmit}
           >
-            {status === 'error' && loginType === 'account' && (
+            {status === 'error' && (
               <LoginMessage
                 content={intl.formatMessage({
                   id: 'pages.login.accountLogin.errorMessage',
@@ -121,55 +122,50 @@ const Login = () => {
                 })}
               />
             )}
-            {type === 'account' && (
-              <>
-                <ProFormText
-                  name="username"
-                  fieldProps={{
-                    size: 'large',
-                    prefix: <UserOutlined className={styles.prefixIcon} />,
-                  }}
-                  placeholder={intl.formatMessage({
-                    id: 'pages.login.username.placeholder',
-                    defaultMessage: '用户名: admin or user',
-                  })}
-                  rules={[
-                    {
-                      required: true,
-                      message: (
-                        <FormattedMessage
-                          id="pages.login.username.required"
-                          defaultMessage="请输入用户名!"
-                        />
-                      ),
-                    },
-                  ]}
-                />
-                <ProFormText.Password
-                  name="password"
-                  fieldProps={{
-                    size: 'large',
-                    prefix: <LockOutlined className={styles.prefixIcon} />,
-                  }}
-                  placeholder={intl.formatMessage({
-                    id: 'pages.login.password.placeholder',
-                    defaultMessage: '密码: ant.design',
-                  })}
-                  rules={[
-                    {
-                      required: true,
-                      message: (
-                        <FormattedMessage
-                          id="pages.login.password.required"
-                          defaultMessage="请输入密码！"
-                        />
-                      ),
-                    },
-                  ]}
-                />
-              </>
-            )}
-
+            <ProFormText
+              name="username"
+              fieldProps={{
+                size: 'large',
+                prefix: <UserOutlined className={styles.prefixIcon} />,
+              }}
+              placeholder={intl.formatMessage({
+                id: 'pages.login.username.placeholder',
+                defaultMessage: '用户名: admin or user',
+              })}
+              rules={[
+                {
+                  required: true,
+                  message: (
+                    <FormattedMessage
+                      id="pages.login.username.required"
+                      defaultMessage="请输入用户名!"
+                    />
+                  ),
+                },
+              ]}
+            />
+            <ProFormText.Password
+              name="password"
+              fieldProps={{
+                size: 'large',
+                prefix: <LockOutlined className={styles.prefixIcon} />,
+              }}
+              placeholder={intl.formatMessage({
+                id: 'pages.login.password.placeholder',
+                defaultMessage: '密码: ant.design',
+              })}
+              rules={[
+                {
+                  required: true,
+                  message: (
+                    <FormattedMessage
+                      id="pages.login.password.required"
+                      defaultMessage="请输入密码！"
+                    />
+                  ),
+                },
+              ]}
+            />
             <div
               style={{
                 marginBottom: 24,
