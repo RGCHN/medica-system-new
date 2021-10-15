@@ -29,13 +29,18 @@ const Login = () => {
   const [userLoginState, setUserLoginState] = useState({});
   const [defaultUsername, setDefaultUsername] = useState('');
   const { setInitialState, initialState  } = useModel('@@initialState');
-  const { setUser, getUser } = useModel('user');
 
   const intl = useIntl();
 
+  const fetchUserInfo = async () => {
+    const userInfo = await initialState?.fetchUserInfo?.();
+    if (userInfo) {
+      await setInitialState((s) => ({ ...s, currentUser: userInfo }));
+    }
+  };
+
   const handleSubmit = async (values) => {
     setSubmitting(true);
-    console.log(initialState);
     try {
       // 登录
       const msg = await login({ ...values });
@@ -45,16 +50,12 @@ const Login = () => {
           defaultMessage: '登录成功！',
         });
         message.success(defaultLoginSuccessMessage);
-        setUser({
-          username: msg.data.username,
-        })
-        history.push('/welcome');
-        localStorage.setItem('currentUser', msg.data.username);
+        await fetchUserInfo();
         localStorage.setItem('access_token', msg.data.data.access_token);
         localStorage.setItem('refresh_token', msg.data.data.refresh_token);
+        history.push('/welcome');
         return ;
       }
-
       message.error(msg.data.msg);
       setUserLoginState(msg);
     } catch (error) {
@@ -66,13 +67,6 @@ const Login = () => {
     }
     setSubmitting(false);
   };
-
-  useEffect(() => {
-    const user = getUser();
-    if (user && user.username) {
-      setDefaultUsername(user.username);
-    }
-  }, [])
 
   const { status } = userLoginState;
   return (
@@ -114,7 +108,7 @@ const Login = () => {
             }}
             onFinish={handleSubmit}
           >
-            {status === 'error' && (
+            {status === 'fail' && (
               <LoginMessage
                 content={intl.formatMessage({
                   id: 'pages.login.accountLogin.errorMessage',

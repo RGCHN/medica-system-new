@@ -136,9 +136,11 @@ export default () => {
 
   return (
     <PageContainer>
-      <Card>
-        <Title level={5}>现在是 北京时间  { dateNow.current }, 星期{day.current}</Title>
-      </Card>
+      <div className={styles.title}>
+        <div className={styles.name}>Hi, 欢迎使用脑卒中AI辅助诊疗系统, 现在是北京时间{ dateNow.current }, 星期{day.current}</div>
+        <br/>
+        <div className={styles.desc}>轻松管理病患数据，AI辅助决策卒中梗死区域，敏捷数据看板</div>
+      </div>
       <br />
       <div className={styles.cardWrapper}>
         <Row gutter={4}>

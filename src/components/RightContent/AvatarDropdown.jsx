@@ -2,7 +2,6 @@ import React, { useCallback } from 'react';
 import { LogoutOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import { Avatar, Menu, Spin } from 'antd';
 import { history, useModel } from 'umi';
-import { stringify } from 'querystring';
 import HeaderDropdown from '../HeaderDropdown';
 import styles from './index.less';
 
@@ -10,17 +9,7 @@ import styles from './index.less';
  * 退出登录，并且将当前的 url 保存
  */
 const loginOut = () => {
-  const { query = {}, pathname } = history.location;
-  const { redirect } = query; // Note: There may be security issues, please note
-
-  if (window.location.pathname !== '/user/login' && !redirect) {
-    history.replace({
-      pathname: '/user/login',
-      search: stringify({
-        redirect: pathname,
-      }),
-    });
-  }
+  history.push('/user/login');
 };
 
 const AvatarDropdown = ({ menu }) => {
@@ -57,7 +46,7 @@ const AvatarDropdown = ({ menu }) => {
 
   const { currentUser } = initialState;
 
-  if (!currentUser || !currentUser.name) {
+  if (!currentUser || !currentUser.username) {
     return loading;
   }
 
