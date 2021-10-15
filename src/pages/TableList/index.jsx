@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Space, Tag, Button } from 'antd';
+import { Space, Tag, Button, message } from 'antd';
 import { NavLink } from '@umijs/preset-dumi/lib/theme';
 import { PlusOutlined } from '@ant-design/icons';
 import ProTable from '@ant-design/pro-table';
 import { stateMap } from '../dataMap';
+import { getPatientList } from '@/services/api';
+import AddPatient from '@/pages/TableList/components/AddPatient';
 
 const DEFAULT_DATA = [
   {
@@ -233,8 +235,24 @@ const TableList = () => {
     }),
   };
 
+  const getPatients = useCallback(async () => {
+    try {
+      const res = await getPatientList();
+      const status = res.data.status;
+      if (status === 'success') {
+        setPatientData(res.data.data.patientList);
+        return ;
+      } else {
+        setPatientData([]);
+      }
+    } catch (error) {
+      setPatientData([]);
+    }
+  }, [])
+
   useEffect(() => {
-    setPatientData(DEFAULT_DATA)
+    getPatients();
+    // setPatientData(DEFAULT_DATA);
   }, [])
 
   const handleChange = useCallback(() => {
@@ -274,9 +292,7 @@ const TableList = () => {
         }}
         dateFormatter="string"
         toolBarRender={() => [
-          <Button key="button" icon={<PlusOutlined />} type="primary">
-            新建
-         </Button>,
+          <AddPatient />,
           <Button key="out">
             导出数据
           </Button>,

@@ -4,8 +4,8 @@ import RightContent from '@/components/RightContent';
 import Footer from '@/components/Footer';
 import logo from './pages/assets/image/logo.svg';
 import { getUser } from '@/services/api';
-const loginPath = '/user/login';
-const registerPath = '/user/Register';
+const loginPath = '/login';
+const registerPath = '/register';
 
 export const initialStateConfig = {
   loading: <PageLoading />,

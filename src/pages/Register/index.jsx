@@ -8,19 +8,8 @@ import ProForm, {  ProFormText } from '@ant-design/pro-form';
 import { useIntl, NavLink, Link, history, FormattedMessage, SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
 import { register } from '@/services/api';
-import logo from '../../assets/image/logo.svg';
+import logo from '../assets/image/logo.svg';
 import styles from './index.less';
-
-const LoginMessage = ({ content }) => (
-  <Alert
-    style={{
-      marginBottom: 24,
-    }}
-    message={content}
-    type="error"
-    showIcon
-  />
-);
 
 const Register = () => {
   const [submitting, setSubmitting] = useState(false);

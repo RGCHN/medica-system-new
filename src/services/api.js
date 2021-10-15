@@ -23,4 +23,8 @@ export async function getAnalyzeData() {
   return http.get('/patientsAnalyze')
 }
 
+export async function getPatientList() {
+  return http.get('/getPatients')
+}
+
 

@@ -3,15 +3,14 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { Alert, message } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import ProForm, {  ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
 import { useIntl, Link, history, FormattedMessage, SelectLang, NavLink, useModel } from 'umi';
 
 import Footer from '@/components/Footer';
 import { login } from '@/services/api';
-import logo from '../../assets/image/logo.svg';
+import logo from '../assets/image/logo.svg';
 import styles from './index.less';
-import { getInitialState } from '@/app';
 
 const LoginMessage = ({ content }) => (
   <Alert

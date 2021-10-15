@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ProCard from '@ant-design/pro-card';
-import { PageHeaderWrapper } from '@ant-design/pro-layout';
-import { Typography, Descriptions, List } from 'antd';
-import { stateMap } from '../dataMap'
+import { Descriptions } from 'antd';
+
 import { EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 
@@ -53,6 +52,9 @@ export default () => {
           <Descriptions.Item label="性别">{patient.sex.toString()==='0'? '男': '女'}</Descriptions.Item>
           <Descriptions.Item label="年龄（岁）">{patient.age}</Descriptions.Item>
           <Descriptions.Item label="就诊时间">{patient.updateTime}</Descriptions.Item>
+          <Descriptions.Item label="糖尿病">{patient.diabetes? '是' : '否'}</Descriptions.Item>
+          <Descriptions.Item label="房颤">{patient.fibrillation? '是' : '否'}</Descriptions.Item>
+          <Descriptions.Item label="高血压">{patient.highBloodPressure? '是' : '否'}</Descriptions.Item>
           <Descriptions.Item label="备注">{patient.remark}</Descriptions.Item>
         </Descriptions>
       </ProCard>
