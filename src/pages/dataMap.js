@@ -18,3 +18,9 @@ export const userTypeMap = {
   "2": "主任医生",
   "3": "医生",
 }
+
+export const roleMap = {
+  1: '管理员',
+  2: '主任医生',
+  3: '医生'
+}

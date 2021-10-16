@@ -29,14 +29,7 @@ const GlobalHeaderRight = () => {
         options={[
         ]}
       />
-      <span
-        className={styles.action}
-        onClick={() => {
-        }}
-      >
-        <QuestionCircleOutlined />
-      </span>
-      <Avatar />
+      <Avatar menu={true}/>
       <SelectLang className={styles.action} />
     </Space>
   );

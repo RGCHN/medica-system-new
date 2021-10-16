@@ -4,19 +4,14 @@ export default [
     layout: false,
     routes: [
       {
-        path: '/',
-        routes: [
-          {
-            name: 'login',
-            path: '/login',
-            component: './login',
-          },
-          {
-            name: 'register',
-            path: '/register',
-            component: './register',
-          },
-        ],
+        path: '/user/login',
+        name: 'login',
+        component: './login',
+      },
+      {
+        path: '/user/register',
+        name: 'register',
+        component: './register',
       },
       {
         component: './404',
@@ -38,7 +33,7 @@ export default [
   {
     path: '/manage',
     name: 'manage',
-    icon: 'team',
+    icon: 'radarChart',
     component: './Patient',
     routes: [
       {
@@ -60,6 +55,19 @@ export default [
         component: './404',
       },
     ],
+  },
+  {
+    path: '/userList',
+    name: 'userList',
+    icon: 'cloudServer',
+    component: './UserList',
+    access: 'userListFilter'
+  },
+  {
+    path: '/selfCenter',
+    name: 'selfCenter',
+    icon: 'team',
+    component: './SelfCenter',
   },
   {
     path: '/',

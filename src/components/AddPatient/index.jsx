@@ -1,19 +1,18 @@
 import React, { useRef } from 'react';
-import { Button, Descriptions, message } from 'antd';
+import { Button, message } from 'antd';
 import ProForm, { DrawerForm, ProFormText, ProFormDatePicker, ProFormTextArea, ProFormSelect, ProFormDigit } from '@ant-design/pro-form';
 import { PlusOutlined } from '@ant-design/icons';
-
 import ProCard from '@ant-design/pro-card';
 
-const AddPatient = () => {
+const AddPatient = (props) => {
+  const { title = '', trigger } = props;
   const formRef = useRef();
 
   return (
     <DrawerForm
-      title="新建病患记录"
+      title={title}
       formRef={formRef}
-      trigger={
-        <Button type="primary"><PlusOutlined />新建</Button>}
+      trigger={trigger}
       drawerProps={{
         forceRender: true,
         destroyOnClose: true,
@@ -37,12 +36,12 @@ const AddPatient = () => {
         }}
       >
         <ProForm.Group>
-          <ProFormText name="recordID" width="md" label="病案号" placeholder="请输入病案号"/>
+          <ProFormText name="recordID" width="md" label="病案号" placeholder="请输入病案号" rules={[{ required: true }]} />
           <ProFormText name="treatID" width="md" label="溶栓治疗编号" placeholder="请输入溶栓治疗编号"/>
-          <ProFormText name="name" width="md" label="患者姓名" placeholder="请输入患者姓名"/>
+          <ProFormText name="name" width="md" label="患者姓名" placeholder="请输入患者姓名" rules={[{ required: true }]}/>
           <ProFormText name="sex" width="md" label="患者性别" placeholder="请输入患者性别"/>
           <ProFormDigit  name="age"  precision={0}width="md" label="患者年龄" placeholder="请输入患者年龄"/>
-          <ProFormDatePicker name="updateTime" width="md" label="就诊时间"/>
+          <ProFormDatePicker name="updateTime" width="md" label="就诊时间" rules={[{ required: true }]}/>
           <ProFormSelect name="diabetes" width="md" label="糖尿病" valueEnum={{
             1: '是',
             0: '否',
@@ -55,7 +54,7 @@ const AddPatient = () => {
             1: '是',
             0: '否',
           }} />
-          <ProFormTextArea name="remark" width="lg" label="备注" placeholder="备注"/>
+          <ProFormTextArea name="remark" width="lg" label="个人信息备注" placeholder="请输入个人信息备注"/>
         </ProForm.Group>
       </ProCard>
       <ProCard
@@ -70,7 +69,8 @@ const AddPatient = () => {
         }}
       >
         <ProForm.Group>
-          <ProFormTextArea name="info" width="lg" label="主诉" placeholder="请输入主诉"/>
+          <ProFormTextArea name="reason" width="lg" label="主诉" placeholder="请输入主诉" rules={[{ required: true }]}/>
+          <ProFormTextArea name="info" width="lg" label="诊断结论" placeholder="请输入诊断结论" />
           <ProFormSelect name="PrevHemorrhage" width="md" label="既往脑出血" valueEnum={{
             1: '是',
             0: '否',
@@ -87,6 +87,7 @@ const AddPatient = () => {
           <ProFormDigit  name="P" width="md" label="P(min)" />
           <ProFormDigit  name="R" width="md" label="R(min)" />
           <ProFormDigit  name="SystolicPressure" width="md" label="急诊收缩压(mmHg)" />
+          <ProFormTextArea name="diseaseRemark" width="lg" label="疾病信息备注" placeholder="请输入疾病信息备注" />
         </ProForm.Group>
       </ProCard>
   </DrawerForm>)

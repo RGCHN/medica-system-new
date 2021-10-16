@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Space, Tag, Button, message } from 'antd';
+import { Space, Button } from 'antd';
 import { NavLink } from '@umijs/preset-dumi/lib/theme';
-import { PlusOutlined } from '@ant-design/icons';
 import ProTable from '@ant-design/pro-table';
 import { stateMap } from '../dataMap';
 import { getPatientList } from '@/services/api';
-import AddPatient from '@/pages/TableList/components/AddPatient';
+import AddPatient from '@/components/AddPatient';
+import { PlusOutlined } from '@ant-design/icons';
 
 const DEFAULT_DATA = [
   {
@@ -292,7 +292,7 @@ const TableList = () => {
         }}
         dateFormatter="string"
         toolBarRender={() => [
-          <AddPatient />,
+          <AddPatient title='新建病患记录' trigger={<Button type="primary"><PlusOutlined />新建</Button>}/>,
           <Button key="out">
             导出数据
           </Button>,
