@@ -13,14 +13,9 @@ export const stateMap = {
   "3": "24小时-2周",
   "4": "大于2周",
 }
-export const userTypeMap = {
-  "1": "管理员",
-  "2": "主任医生",
-  "3": "医生",
-}
 
 export const roleMap = {
-  1: '管理员',
-  2: '主任医生',
-  3: '医生'
+  '管理员': 1,
+  '主任医生': 2,
+  '医生': 3
 }

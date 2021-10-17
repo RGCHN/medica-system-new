@@ -28,8 +28,13 @@ export async function getAnalyzeData() {
   return http.get('/patientsAnalyze')
 }
 
-export async function getPatientList() {
-  return http.get('/getPatients')
+export async function updateRole(body) {
+  return http.post('/updateRole', body);
+}
+
+
+export async function deleteUser(body) {
+  return http.post('/deleteUser', body)
 }
 
 // 获取用户列表
@@ -37,4 +42,7 @@ export async function getUserList() {
   return http.get('/userInfo')
 }
 
+ export async function getPatientList() {
+   return http.get('/getPatients')
+ }
 

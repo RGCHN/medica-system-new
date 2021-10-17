@@ -20,7 +20,7 @@ http.interceptors.response.use(res => {
   console.log('响应查看')
   console.log(res);
   if (res.data.msg.toString() === "NoLogin") {
-    history.push('/login');
+    history.push('/user/login');
   }
   return res
 }, err => {

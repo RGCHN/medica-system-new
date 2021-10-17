@@ -18,15 +18,7 @@ export async function getInitialState() {
       const res = await getUser();
       return {
         ...res.data.data,
-        avatar: avatar,
-        signature: '海纳百川，有容乃大',
-        title: '主任医生',
-        group: '浙大附属第二医院-神经外科',
-        country: 'China',
-        access: 'admin',
-        email: '123456789@qq.com',
-        phone: '13956341256',
-        address: '西湖区工专路 77 号',
+        avatar: avatar
       };
     } catch (error) {
       history.push(loginPath);
