@@ -19,6 +19,7 @@ http.interceptors.request.use(config=>{
 http.interceptors.response.use(res => {
   console.log('响应查看')
   console.log(res);
+  console.log(res.data.msg.toString());
   if (res.data.msg.toString() === "NoLogin") {
     history.push('/user/login');
   }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import ProCard from '@ant-design/pro-card';
 import { Button, Descriptions } from 'antd';
 import { EditOutlined } from '@ant-design/icons';
@@ -11,6 +11,9 @@ const MOCK_PATIENT = {
   name: '张忠尧',
   sex: 0,
   age: 77,
+  // TODO 新的
+  state: '', // 脑损伤阶段
+  doctor: '', // 当前负责医师
   treatID: '2892', // 溶栓治疗编号
   remark: '入MT临床试验', // 个人信息备注
   diseaseRemark: '疾病信息备注', // 疾病信息备注
@@ -23,7 +26,7 @@ const MOCK_PATIENT = {
   diabetes: true, // 糖尿病
   fibrillation: false, // 房颤
   PrevStroke: false, //既往卒中
-  Warfarin: false, // 是否服用华法林
+  Warfarin: false, // 是 否服用华法林
   T: 37.2, // 体温
   P: 77,
   R: 12,
@@ -32,6 +35,10 @@ const MOCK_PATIENT = {
 
 export default () => {
   const [patient, setPatient] = useState(MOCK_PATIENT);
+
+  const getPatientDetail = useCallback(() => {
+
+  }, [])
 
   useEffect(() => {
   }, [])

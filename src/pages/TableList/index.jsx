@@ -8,56 +8,6 @@ import { getPatientList } from '@/services/api';
 import AddPatient from '@/components/AddPatient';
 import { PlusOutlined } from '@ant-design/icons';
 
-const DEFAULT_DATA = [
-  {
-    key:'1',
-    id: '1',
-    recordID:'1111',
-    doctor:'张伟华医师',
-    name: '李兵',
-    sex:'男',
-    age: 32,
-    cva: '出血性脑梗塞',
-    state: '1',
-    updateTime: '2020-9-11',
-  },
-  {
-    key:'2',
-    id: '2',
-    recordID:'2222',
-    doctor:'张伟华医师',
-    name: '林硕',
-    sex:'男',
-    cva: '缺血性脑梗塞',
-    age: 18,
-    state: '2',
-    updateTime: '2020-01-15',
-  },
-  {
-    key:'3',
-    id: '3',
-    recordID:'3333',
-    doctor:'王业医师',
-    name: '刘雯',
-    sex:'女',
-    age: 55,
-    cva: '缺血性脑梗塞',
-    state: '3',
-    updateTime: '2020-05-23',
-  },
-  {
-    key:'4',
-    id: '4',
-    recordID:'4444',
-    doctor:'李涛医师',
-    sex:'女',
-    name: '吴芬婷',
-    age: 82,
-    cva: '出血性脑梗塞',
-    state: '4',
-    updateTime: '2019-12-27',
-  },
-];
 const listColumns = [
   {
     title: '病例编号',
@@ -242,9 +192,9 @@ const TableList = () => {
       if (status === 'success') {
         setPatientData(res.data.data.patientList);
         return ;
-      } else {
-        setPatientData([]);
       }
+      message.error(res.data.msg);
+      setPatientData([]);
     } catch (error) {
       setPatientData([]);
     }
@@ -264,12 +214,7 @@ const TableList = () => {
       <ProTable
         columns={listColumns}
         actionRef={actionRef}
-        request={() => {
-          return Promise.resolve({
-            data: patientData,
-            success: true
-          })
-        }}
+        dataSource={patientData}
         columnsState={{
           persistenceKey: 'pro-table-singe-demos',
           persistenceType: 'localStorage',
@@ -292,10 +237,7 @@ const TableList = () => {
         }}
         dateFormatter="string"
         toolBarRender={() => [
-          <AddPatient title='新建病患记录' trigger={<Button type="primary"><PlusOutlined />新建</Button>}/>,
-          <Button key="out">
-            导出数据
-          </Button>,
+          <AddPatient key="add" title='新建病患记录' trigger={<Button type="primary"><PlusOutlined />新建</Button>}/>,
         ]}
         options={{
           show: true,
