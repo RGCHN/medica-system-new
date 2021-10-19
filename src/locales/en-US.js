@@ -5,6 +5,7 @@ import pages from './en-US/pages';
 import pwa from './en-US/pwa';
 import settingDrawer from './en-US/settingDrawer';
 import settings from './en-US/settings';
+import messages from './en-US/messages';
 export default {
   'navBar.lang': 'Languages',
   'layout.user.link.help': 'Help',
@@ -21,4 +22,5 @@ export default {
   ...pwa,
   ...component,
   ...pages,
+  ...messages
 };

@@ -1,12 +1,36 @@
-import React, { useRef } from 'react';
-import { Button, message } from 'antd';
+import React, { useRef, useCallback } from 'react';
+import { message } from 'antd';
 import ProForm, { DrawerForm, ProFormText, ProFormDatePicker, ProFormTextArea, ProFormSelect, ProFormDigit } from '@ant-design/pro-form';
-import { PlusOutlined } from '@ant-design/icons';
 import ProCard from '@ant-design/pro-card';
+import { useIntl } from 'umi';
+import { addPatient } from '@/services/api';
 
 const AddPatient = (props) => {
-  const { title = '', trigger } = props;
+  const { title = '', trigger, defaultData = {} } = props;
   const formRef = useRef();
+  const intl = useIntl();
+
+  const handleFinish = useCallback(async values => {
+    const defaultErrorMessage = intl.formatMessage({
+      id: 'errors.message.addPatient',
+      defaultMessage: '提交信息错误！',
+    });
+    try {
+      console.log(values);
+      const res = await addPatient({
+        ...values
+      });
+      if (res.data.status === 'success') {
+
+      } else {
+        message.error(defaultErrorMessage)
+      }
+    }
+     catch (e) {
+      message.error(defaultErrorMessage)
+    }
+    return true;
+  }, [])
 
   return (
     <DrawerForm
@@ -16,14 +40,9 @@ const AddPatient = (props) => {
       drawerProps={{
         forceRender: true,
         destroyOnClose: true,
+        maskClosable: false
       }}
-      onFinish={async (values) => {
-        await waitTime(2000);
-        message.success('提交成功');
-        // 不返回不会关闭弹框
-        return true;
-  }}>
-
+      onFinish={handleFinish}>
       <ProCard
         title="个人信息"
         bordered
@@ -39,8 +58,11 @@ const AddPatient = (props) => {
           <ProFormText name="recordID" width="md" label="病案号" placeholder="请输入病案号" rules={[{ required: true }]} />
           <ProFormText name="treatID" width="md" label="溶栓治疗编号" placeholder="请输入溶栓治疗编号"/>
           <ProFormText name="name" width="md" label="患者姓名" placeholder="请输入患者姓名" rules={[{ required: true }]}/>
-          <ProFormText name="sex" width="md" label="患者性别" placeholder="请输入患者性别"/>
-          <ProFormDigit  name="age"  precision={0}width="md" label="患者年龄" placeholder="请输入患者年龄"/>
+          <ProFormSelect name="sex" width="md" label="患者性别" placeholder="请输入患者性别" valueEnum={{
+            1: '女',
+            0: '男',
+          }}/>
+          <ProFormDigit  name="age"  precision={0} width="md" label="患者年龄" placeholder="请输入患者年龄"/>
           <ProFormDatePicker name="updateTime" width="md" label="就诊时间" rules={[{ required: true }]}/>
           <ProFormSelect name="diabetes" width="md" label="糖尿病" valueEnum={{
             1: '是',

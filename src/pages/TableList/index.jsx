@@ -1,189 +1,116 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Space, Button } from 'antd';
-import { NavLink } from '@umijs/preset-dumi/lib/theme';
+import { useModel } from 'umi';
 import ProTable from '@ant-design/pro-table';
-import { stateMap } from '../dataMap';
 import { getPatientList } from '@/services/api';
 import AddPatient from '@/components/AddPatient';
 import { PlusOutlined } from '@ant-design/icons';
-
-const listColumns = [
-  {
-    title: '病例编号',
-    dataIndex: 'id',
-    key: 'id',
-    copyable: true,
-    ellipsis: true,
-    width:100
-  },
-  {
-    title: '姓名',
-    dataIndex: 'name',
-    copyable: true,
-    key: 'name',
-    ellipsis: true,
-    width:100
-  },
-  {
-    title: '性别',
-    dataIndex: 'sex',
-    key: 'sex',
-    ellipsis: true,
-    width:60,
-    filters: true,
-    valueType: 'select',
-    valueEnum: {
-      all: { text: '全部', status: 'Default' },
-      male: { text: '男', status: '男'},
-      female: { text: '女', status: '女'}
-    }
-  },
-  {
-    title: '年龄',
-    dataIndex: 'age',
-    key: 'age',
-    ellipsis: true,
-    width:60
-  },
-  {
-    title: '脑损伤阶段',
-    dataIndex: 'state',
-    key: 'state',
-    ellipsis: true,
-    render: (_, record) => {
-      const state = record.state;
-      return (
-        <span>{stateMap[state]}</span>
-      )
-    },
-    valueEnum: {
-      all: { text: '全部', status: 'Default' },
-      '1': { text: '0-6小时', status: 'Error'},
-      '2': { text: '6-24小时', status: 'Success'},
-      '3': { text: '24小时-2周', status: 'Processing'},
-      '4': { text: '大于2周', status: 'Default'},
-    }
-  },
-  {
-    title: '负责医师',
-    dataIndex: 'doctor',
-    key: 'doctor',
-    ellipsis: true,
-    width:120
-  },
-  {
-    title: '病案号',
-    dataIndex: 'recordID',
-    key: 'recordID',
-    ellipsis: true,
-    copyable: true,
-  },
-  {
-    title: '最近更新时间',
-    dataIndex: 'updateTime',
-    key: 'updateTime',
-    ellipsis: true,
-    sorter: true,
-    hideInSearch: true,
-  },
-  {
-    title: '操作',
-    dataIndex: 'id',
-    key: 'action',
-    render: id => (
-      <Space size="middle">
-        <Button>
-          <NavLink to={`/patientInfo/basic/${id}/edit`}>查看</NavLink>
-        </Button>
-      </Space>
-    ),
-  },
-];
-const operatorColumns = [
-  {
-    title: '病案号',
-    dataIndex: 'recordID',
-    key: 'recordID',
-    ellipsis: true,
-    width:100
-  },
-  {
-    title: '姓名',
-    dataIndex: 'name',
-    key: 'name',
-    ellipsis: true,
-    width:100
-  },
-  {
-    title: '性别',
-    dataIndex: 'sex',
-    key: 'sex',
-    ellipsis: true,
-    width:60,
-    render: sex => {
-      if (sex.toString() === '0') {
-        return (
-          <span>男</span>
-        )
-      } else {
-        return (
-          <span>女</span>
-        )
-      }
-    }
-  },
-  {
-    title: '年龄',
-    dataIndex: 'age',
-    key: 'age',
-    ellipsis: true,
-    width:60
-  },
-  {
-    title: '脑损伤阶段',
-    dataIndex: 'state',
-    key: 'state',
-    ellipsis: true,
-    render: state => {
-      return (
-        <span>{stateMap[state]}</span>
-      )
-    },
-  },
-  {
-    title: '负责医师',
-    dataIndex: 'doctor',
-    key: 'doctor',
-    ellipsis: true,
-    width:120
-  },
-  {
-    title: '操作',
-    dataIndex: 'id',
-    key: 'action',
-    render: id => (
-      <Space size="middle">
-        <Button>
-          <NavLink to={`/patientInfo/basic/${id}/edit`}>编辑</NavLink>
-        </Button>
-      </Space>
-    ),
-  },
-];
+import { Button } from 'antd';
+import { NavLink } from '@umijs/preset-dumi/lib/theme';
 
 const TableList = () => {
-  const [ patientData, setPatientData] = useState([]);
+  const  [ patientData, setPatientData] = useState([]);
+  const  { setCurrentPatient }= useModel('patient');
   const actionRef = useRef();
-  const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+
+  const listColumns = [
+    /*{
+      title: '病人编号',
+      dataIndex: 'id',
+      key: 'id',
+      ellipsis: true,
+      copyable: true,
+    },*/
+    {
+      title: '病案号',
+      dataIndex: 'recordID',
+      key: 'recordID',
+      ellipsis: true,
+      copyable: true,
     },
-    getCheckboxProps: record => ({
-      disabled: record.name === 'Disabled User',
-      name: record.name,
-    }),
-  };
+    {
+      title: '姓名',
+      dataIndex: 'name',
+      copyable: true,
+      key: 'name',
+      ellipsis: true,
+      width:100
+    },
+    {
+      title: '性别',
+      dataIndex: 'sex',
+      key: 'sex',
+      ellipsis: true,
+      initialValue: 'all',
+      onFilter: true,
+      filters: true,
+      valueType: 'select',
+      valueEnum: {
+        all: { text: '全部', status: 'Default' },
+        0: { text: '男', status: 'Processing'},
+        1: { text: '女', status: 'Warning'}
+      }
+    },
+    {
+      title: '年龄',
+      dataIndex: 'age',
+      key: 'age',
+      ellipsis: true,
+    },
+    {
+      title: '脑损伤阶段',
+      dataIndex: 'state',
+      key: 'state',
+      ellipsis: false,
+      onFilter: true,
+      filters: true,
+      valueType: 'select',
+      initialValue: 'all',
+      valueEnum: {
+        all: { text: '全部', status: 'Default' },
+        '1': { text: '0-6小时', status: 'Error'},
+        '2': { text: '6-24小时', status: 'Success'},
+        '3': { text: '24小时-2周', status: 'Processing'},
+        '4': { text: '大于2周', status: 'Default'},
+      }
+    },
+    {
+      title: '负责医师',
+      dataIndex: 'doctor',
+      key: 'doctor',
+      ellipsis: true,
+    },
+    {
+      title: '更新时间',
+      dataIndex: 'updateTime',
+      key: 'updateTime',
+      ellipsis: true,
+      sorter: (a, b) => a.updateTime - b.updateTime,
+      hideInSearch: true,
+      valueType: 'date',
+    },
+    {
+      title: '操作',
+      dataIndex: 'id',
+      key: 'action',
+      render: id => {
+        return (
+          <div onClick={() => {
+            setCurrentPatient(id);
+          }}>
+            <div key='message'><NavLink  to={`manage/message`}>详细信息</NavLink></div>
+            <div key='predict'><NavLink to={`manage/predict`}>新建预测</NavLink></div>
+            <div  key='image'><NavLink to={`manage/image`}>预测记录</NavLink></div>
+          </div>
+        )
+        /* return [
+           <div key='message'><NavLink  to={`manage/message`}>详细信息</NavLink></div>,
+           <div key='predict'><NavLink to={`manage/predict`}>新建预测</NavLink></div>,
+           <div  key='image'><NavLink to={`manage/image`}>预测记录</NavLink></div>,
+         ]*/
+      },
+    },
+  ];
 
   const getPatients = useCallback(async () => {
     try {
@@ -202,15 +129,10 @@ const TableList = () => {
 
   useEffect(() => {
     getPatients();
-    // setPatientData(DEFAULT_DATA);
-  }, [])
-
-  const handleChange = useCallback(() => {
-
   }, [])
 
   return (
-    <PageContainer>
+    <PageContainer fixedHeader={true}>
       <ProTable
         columns={listColumns}
         actionRef={actionRef}
@@ -220,18 +142,7 @@ const TableList = () => {
           persistenceType: 'localStorage',
         }}
         rowKey="id"
-        search={{
-          labelWidth: 'auto',
-        }}
-        form={{
-        // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
-          syncToUrl: (values, type) => {
-            if (type === 'get') {
-              return Object.assign(Object.assign({}, values), { created_at: [values.startTime, values.endTime] });
-           }
-            return values;
-          }
-        }}
+        search={false}
         pagination={{
           pageSize: 5,
         }}

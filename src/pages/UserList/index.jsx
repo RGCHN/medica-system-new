@@ -49,7 +49,7 @@ const UserList = () => {
         <a key="editable" onClick={() => {
           action?.startEditable?.(record.id);
         }}>
-          编辑
+          修改权限
         </a>,
         <a key="delete" onClick={() => {
           handleDelete(index, record)

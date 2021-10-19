@@ -46,3 +46,10 @@ export async function getUserList() {
    return http.get('/getPatients')
  }
 
+ export async function addPatient(body) {
+  return http.post('/addPatient', body)
+}
+
+export async function getPatientByID(body) {
+  return http.post('/getPatientByID', body)
+}

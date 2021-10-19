@@ -5,6 +5,7 @@ import settings from './ja-JP/settings';
 import pwa from './ja-JP/pwa';
 import component from './ja-JP/component';
 import pages from './ja-JP/pages';
+import messages from './ja-JP/messages';
 export default {
   'navBar.lang': '言語',
   'layout.user.link.help': 'ヘルプ',
@@ -20,4 +21,5 @@ export default {
   ...pwa,
   ...component,
   ...pages,
+  ...messages,
 };

@@ -26,7 +26,6 @@ const LoginMessage = ({ content }) => (
 const Login = () => {
   const [submitting, setSubmitting] = useState(false);
   const [userLoginState, setUserLoginState] = useState({});
-  const [defaultUsername, setDefaultUsername] = useState('');
   const { setInitialState, initialState  } = useModel('@@initialState');
 
   const intl = useIntl();
@@ -86,7 +85,7 @@ const Login = () => {
         <div className={styles.main}>
           <ProForm
             initialValues={{
-              username: defaultUsername,
+              username: '',
               autoLogin: true,
             }}
             submitter={{

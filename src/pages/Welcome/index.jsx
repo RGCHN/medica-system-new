@@ -6,7 +6,6 @@ import { Pie, Column, Gauge, Rose, Line} from '@ant-design/charts'
 import { dayMap } from '@/pages/dataMap';
 import styles from './index.less';
 
-const { Title } = Typography;
 
 /*mock数据*/
 const genderData = [
@@ -135,7 +134,7 @@ export default () => {
   }, [])
 
   return (
-    <PageContainer>
+    <PageContainer fixedHeader={true}>
       <div className={styles.title}>
         <div className={styles.name}>Hi, 欢迎使用脑卒中AI辅助诊疗系统, 现在是北京时间{ dateNow.current }, 星期{day.current}</div>
         <br/>

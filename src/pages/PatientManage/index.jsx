@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import ProCard from '@ant-design/pro-card';
-import { Button, Descriptions } from 'antd';
+import { Button, Descriptions, message } from 'antd';
+import { useIntl, useModel } from 'umi';
 import { EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import AddPatient from '@/components/AddPatient';
+import { getPatientByID } from '@/services/api';
 
 
 const MOCK_PATIENT = {
@@ -34,21 +36,52 @@ const MOCK_PATIENT = {
 }
 
 export default () => {
-  const [patient, setPatient] = useState(MOCK_PATIENT);
+  const [patient, setPatient] = useState(undefined);
+  const  { currentPatient }= useModel('patient');
+  const intl = useIntl();
 
-  const getPatientDetail = useCallback(() => {
+  console.log(currentPatient);
 
-  }, [])
+
+  const getPatientDetail = useCallback(async () => {
+    if (!currentPatient) {
+      return ;
+    }
+    try {
+      const res = await getPatientByID({
+        patientID: currentPatient
+      });
+      if (res.data.status === 'success') {
+        const successMessage = intl.formatMessage({
+          id: 'message.success.getPatient',
+          defaultMessage: '获取病人信息成功！',
+        });
+        setPatient(res.data.data.patient);
+        message.success(successMessage)
+        return;
+      }
+        message.error(res.data.msg);
+        setPatient({});
+    } catch (e) {
+      const failMessage = intl.formatMessage({
+        id: 'message.error.getPatient',
+        defaultMessage: '获取病人信息失败！',
+      });
+      message.error(failMessage);
+    }
+  }, [currentPatient])
 
   useEffect(() => {
-  }, [])
-
-  const editInformation = () => {
-
-  }
+    getPatientDetail();
+  }, []);
 
   return (
-    <ProCard bordered headerBordered gutter={16} extra={ <AddPatient title='修改病人信息' trigger={<Button type="primary"><EditOutlined />编辑</Button>}/>}>
+    <ProCard
+      title='病人详细信息'
+      bordered
+      headerBordered
+      gutter={16}
+      extra={ <AddPatient title='修改病人信息' trigger={<Button type="primary"><EditOutlined />编辑</Button>}/>}>
       <ProCard
         title="个人档案"
         type="inner"
@@ -58,12 +91,11 @@ export default () => {
           <Descriptions.Item label="病案号">{patient.recordID}</Descriptions.Item>
           <Descriptions.Item label="溶栓治疗编号">{patient.treatID}</Descriptions.Item>
           <Descriptions.Item label="姓名">{patient.name}</Descriptions.Item>
-          <Descriptions.Item label="性别">{patient.sex.toString()==='0'? '男': '女'}</Descriptions.Item>
+          <Descriptions.Item label="性别">{patient.sex ? '男': '女'}</Descriptions.Item>
           <Descriptions.Item label="年龄（岁）">{patient.age}</Descriptions.Item>
           <Descriptions.Item label="就诊时间">{patient.updateTime}</Descriptions.Item>
           <Descriptions.Item label="个人信息备注">{patient.remark}</Descriptions.Item>
         </Descriptions>
-
         <Descriptions layout='vertical' bordered>
           <Descriptions.Item label="糖尿病">{patient.diabetes? '是' : '否'}</Descriptions.Item>
           <Descriptions.Item label="房颤">{patient.fibrillation? '是' : '否'}</Descriptions.Item>

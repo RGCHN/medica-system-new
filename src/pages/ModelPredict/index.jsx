@@ -1,17 +1,14 @@
 import React, { useRef, useState } from 'react';
 import ProForm, {
   StepsForm,
-  ProFormText,
   ProFormDatePicker,
-  ProFormSelect,
-  ProFormTextArea,
-  ProFormCheckbox,
-  ProFormDateRangePicker, ProFormUploadDragger,
+  ProFormUploadDragger,
 } from '@ant-design/pro-form';
 import ProCard from '@ant-design/pro-card';
 import { Divider, message } from 'antd';
 import { waitTime } from '@/utils';
 import dayjs from 'dayjs';
+import { useModel } from 'umi';
 
 const ModelPredict = (props) => {
   const [CBFList, setCBFList] = useState([]);
@@ -19,7 +16,7 @@ const ModelPredict = (props) => {
   const [MTTList, setMTTList] = useState([]);
   const [TMAXList, setTMAXList] = useState([]);
   const [DWIList, setDWIList] = useState([]);
-  const [recordTime, setRecordTime] = useState('');
+  const  { currentPatient }= useModel('patient');
   const tempDate = useRef('');
   const formRef = useRef();
 
@@ -97,10 +94,8 @@ const ModelPredict = (props) => {
         <StepsForm.StepForm
           name="checkbox" title="开始训练"
           onFinish={async () => {return true;}}
-        >
-        </StepsForm.StepForm>
-        <StepsForm.StepForm name="time" title="结果查看" >
-        </StepsForm.StepForm>
+         />
+        <StepsForm.StepForm name="time" title="结果查看"  />
       </StepsForm>
     </ProCard>
   )

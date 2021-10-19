@@ -32,9 +32,9 @@ export default [
   },
   {
     path: '/manage',
-    name: 'manage',
     icon: 'radarChart',
     component: './Patient',
+    hideMenu: true,
     routes: [
       {
         path: '/manage/message',
@@ -57,11 +57,10 @@ export default [
     ],
   },
   {
-    path: '/userList',
+    path: '/useList',
     name: 'userList',
     icon: 'cloudServer',
-    component: './UserList',
-    access: 'userListFilter'
+    component: './UserList'
   },
   {
     path: '/selfCenter',

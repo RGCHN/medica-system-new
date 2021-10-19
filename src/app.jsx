@@ -5,12 +5,21 @@ import Footer from '@/components/Footer';
 import logo from './pages/assets/image/logo.svg';
 import avatar from './pages/assets/image/avatar.png'
 import { getUser } from '@/services/api';
+import { defaultRoutes, patientRoutes} from '../config/routes';
+import { LeftOutlined } from '@ant-design/icons';
+import { Button } from 'antd';
 const loginPath = '/user/login';
 const registerPath = '/user/register';
 
 export const initialStateConfig = {
   loading: <PageLoading />,
 };
+
+const patientPath = [
+  '/manage/message',
+  '/manage/predict',
+  '/manage/image'
+]
 
 export async function getInitialState() {
   const fetchUserInfo = async () => {
@@ -57,9 +66,6 @@ export const layout = ({ initialState }) => {
         history.push(loginPath);
       }
     },
-    links: [],
-    // 自定义 403 页面
-    // unAccessible: <div>unAccessible</div>,
     ...initialState?.settings,
   };
 };
