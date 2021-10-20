@@ -10,7 +10,7 @@ import { NavLink } from '@umijs/preset-dumi/lib/theme';
 
 const TableList = () => {
   const [patientData, setPatientData] = useState([]);
-  const { setPatientID, getPatientID } = useModel('patient');
+  const { setPatientID } = useModel('patient');
   const actionRef = useRef();
 
   const listColumns = [

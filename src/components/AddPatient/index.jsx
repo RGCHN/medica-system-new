@@ -9,7 +9,7 @@ import ProForm, {
   ProFormDigit,
 } from '@ant-design/pro-form';
 import ProCard from '@ant-design/pro-card';
-import { useIntl } from 'umi';
+import { useIntl, useModel } from 'umi';
 import { addPatient } from '@/services/api';
 
 const DEFAULT_PATIENT = {
@@ -25,16 +25,16 @@ const DEFAULT_PATIENT = {
   info: '', // 诊断结论
   createTime: new Date().getTime(), // 就诊时间
   strokeTime: new Date().getTime(), // 发病日期
-  PrevHemorrhage: 0, // 既往脑出血
+  prevHemorrhage: 0, // 既往脑出血
   highBloodPressure: 0, // 高血压
   diabetes: 0, // 糖尿病
   fibrillation: 0, // 房颤
-  PrevStroke: 0, //既往卒中
-  Warfarin: 0, // 是 否服用华法林
+  prevStroke: 0, //既往卒中
+  warfarin: 0, // 是 否服用华法林
   T: 37.2, // 体温
   P: 77,
   R: 12,
-  SystolicPressure: 123, // 急诊收缩压
+  systolicPressure: 123, // 急诊收缩压
 };
 
 const AddPatient = (props) => {
@@ -52,15 +52,14 @@ const AddPatient = (props) => {
       defaultMessage: '提交信息成功！',
     });
     try {
-      console.log(values);
-      /* const res = await addPatient({
-        ...values
+      const res = await addPatient({
+        ...values,
       });
       if (res.data.status === 'success') {
-        message.success(defaultSuccessMessage)
+        message.success(defaultSuccessMessage);
       } else {
-        message.error(defaultErrorMessage)
-      }*/
+        message.error(defaultErrorMessage);
+      }
     } catch (e) {
       message.error(defaultErrorMessage);
     }
@@ -210,7 +209,7 @@ const AddPatient = (props) => {
             ]}
           />
           <ProFormSelect
-            name="PrevHemorrhage"
+            name="prevHemorrhage"
             width="md"
             label="既往脑出血"
             options={[
@@ -219,7 +218,7 @@ const AddPatient = (props) => {
             ]}
           />
           <ProFormSelect
-            name="PrevStroke"
+            name="prevStroke"
             width="md"
             label="既往卒中"
             options={[
@@ -228,7 +227,7 @@ const AddPatient = (props) => {
             ]}
           />
           <ProFormSelect
-            name="Warfarin"
+            name="warfarin"
             width="md"
             label="服用华法林"
             options={[
@@ -239,7 +238,7 @@ const AddPatient = (props) => {
           <ProFormDigit name="T" width="md" label="T(℃)" />
           <ProFormDigit name="P" width="md" label="P(min)" />
           <ProFormDigit name="R" width="md" label="R(min)" />
-          <ProFormDigit name="SystolicPressure" width="md" label="急诊收缩压(mmHg)" />
+          <ProFormDigit name="systolicPressure" width="md" label="急诊收缩压(mmHg)" />
           <ProFormTextArea
             name="diseaseRemark"
             width="lg"

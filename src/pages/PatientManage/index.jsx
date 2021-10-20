@@ -39,10 +39,9 @@ const MOCK_PATIENT = {
 
 export default () => {
   const [patient, setPatient] = useState(undefined);
-  const { getPatientID } = useModel('patient');
+  const { getPatientID, setPatientData } = useModel('patient');
   const intl = useIntl();
   const id = getPatientID();
-  console.log(getPatientID());
 
   const getPatientDetail = useCallback(async () => {
     if (!id) {
@@ -63,6 +62,7 @@ export default () => {
           defaultMessage: '获取病人信息成功！',
         });
         setPatient(res.data.data.patient);
+        setPatientData(res.data.data.patient);
         message.success(successMessage);
         return;
       }
@@ -93,6 +93,7 @@ export default () => {
       gutter={16}
       extra={
         <AddPatient
+          defaultData={patient}
           title="修改病人信息"
           trigger={
             <Button type="primary">
@@ -111,7 +112,7 @@ export default () => {
           <Descriptions.Item label="性别">{patient.sex ? '女' : '男'}</Descriptions.Item>
           <Descriptions.Item label="年龄（岁）">{patient.age}</Descriptions.Item>
           <Descriptions.Item label="就诊时间">
-            {dayjs(patient.updateTime).format('YYYY-MM-DD')}
+            {dayjs(Number(patient.updateTime)).format('YYYY-MM-DD')}
           </Descriptions.Item>
           <Descriptions.Item label="发病时间">
             {dayjs(patient.strokeTime).format('YYYY-MM-DD')}
