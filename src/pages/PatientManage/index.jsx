@@ -2,12 +2,13 @@ import React, { useCallback, useEffect, useState } from 'react';
 import ProCard from '@ant-design/pro-card';
 import { Button, Descriptions, message } from 'antd';
 import { useIntl, useModel } from 'umi';
-import { EditOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
+import { EditOutlined } from '@ant-design/icons';
 import AddPatient from '@/components/AddPatient';
 import { getPatientByID } from '@/services/api';
+import styles from './index.less';
 
-
+/*
 const MOCK_PATIENT = {
   recordID:'1111', // 病案号
   name: '张忠尧',
@@ -34,22 +35,27 @@ const MOCK_PATIENT = {
   R: 12,
   SystolicPressure: 123, // 急诊收缩压
 }
+*/
 
 export default () => {
   const [patient, setPatient] = useState(undefined);
-  const  { currentPatient }= useModel('patient');
+  const { getPatientID } = useModel('patient');
   const intl = useIntl();
-
-  console.log(currentPatient);
-
+  const id = getPatientID();
+  console.log(getPatientID());
 
   const getPatientDetail = useCallback(async () => {
-    if (!currentPatient) {
-      return ;
+    if (!id) {
+      const failMessage = intl.formatMessage({
+        id: 'message.error.getPatient',
+        defaultMessage: '获取病人信息失败！',
+      });
+      message.error(failMessage);
+      return;
     }
     try {
       const res = await getPatientByID({
-        patientID: currentPatient
+        patientID: id,
       });
       if (res.data.status === 'success') {
         const successMessage = intl.formatMessage({
@@ -57,11 +63,11 @@ export default () => {
           defaultMessage: '获取病人信息成功！',
         });
         setPatient(res.data.data.patient);
-        message.success(successMessage)
+        message.success(successMessage);
         return;
       }
-        message.error(res.data.msg);
-        setPatient({});
+      message.error(res.data.msg);
+      setPatient({});
     } catch (e) {
       const failMessage = intl.formatMessage({
         id: 'message.error.getPatient',
@@ -69,57 +75,79 @@ export default () => {
       });
       message.error(failMessage);
     }
-  }, [currentPatient])
+  }, [id]);
 
   useEffect(() => {
     getPatientDetail();
   }, []);
 
+  if (!patient) {
+    return <></>;
+  }
+
   return (
     <ProCard
-      title='病人详细信息'
+      title="病人详细信息"
       bordered
       headerBordered
       gutter={16}
-      extra={ <AddPatient title='修改病人信息' trigger={<Button type="primary"><EditOutlined />编辑</Button>}/>}>
-      <ProCard
-        title="个人档案"
-        type="inner"
-        bordered
-      >
+      extra={
+        <AddPatient
+          title="修改病人信息"
+          trigger={
+            <Button type="primary">
+              <EditOutlined />
+              编辑
+            </Button>
+          }
+        />
+      }
+    >
+      <ProCard title="个人档案" type="inner" bordered>
         <Descriptions column={1}>
           <Descriptions.Item label="病案号">{patient.recordID}</Descriptions.Item>
           <Descriptions.Item label="溶栓治疗编号">{patient.treatID}</Descriptions.Item>
           <Descriptions.Item label="姓名">{patient.name}</Descriptions.Item>
-          <Descriptions.Item label="性别">{patient.sex ? '男': '女'}</Descriptions.Item>
+          <Descriptions.Item label="性别">{patient.sex ? '女' : '男'}</Descriptions.Item>
           <Descriptions.Item label="年龄（岁）">{patient.age}</Descriptions.Item>
-          <Descriptions.Item label="就诊时间">{patient.updateTime}</Descriptions.Item>
+          <Descriptions.Item label="就诊时间">
+            {dayjs(patient.updateTime).format('YYYY-MM-DD')}
+          </Descriptions.Item>
+          <Descriptions.Item label="发病时间">
+            {dayjs(patient.strokeTime).format('YYYY-MM-DD')}
+          </Descriptions.Item>
           <Descriptions.Item label="个人信息备注">{patient.remark}</Descriptions.Item>
         </Descriptions>
-        <Descriptions layout='vertical' bordered>
-          <Descriptions.Item label="糖尿病">{patient.diabetes? '是' : '否'}</Descriptions.Item>
-          <Descriptions.Item label="房颤">{patient.fibrillation? '是' : '否'}</Descriptions.Item>
-          <Descriptions.Item label="高血压">{patient.highBloodPressure? '是' : '否'}</Descriptions.Item>
+        <Descriptions layout="vertical" bordered>
+          <Descriptions.Item label="糖尿病">{patient.diabetes ? '否' : '是'}</Descriptions.Item>
+          <Descriptions.Item label="房颤">{patient.fibrillation ? '否' : '是'}</Descriptions.Item>
+          <Descriptions.Item label="高血压">
+            {patient.highBloodPressure ? '否' : '是'}
+          </Descriptions.Item>
         </Descriptions>
       </ProCard>
-      <ProCard
-        title="疾病信息"
-        type="inner"
-        bordered
-      >
-        <Descriptions column={1}>
-          <Descriptions.Item label="主诉" span={4}>{patient.reason}</Descriptions.Item>
-          <Descriptions.Item label="诊断结论" span={4}>{patient.info}</Descriptions.Item>
-          <Descriptions.Item label="既往脑出血">{patient.PrevHemorrhage? '是' : '否'}</Descriptions.Item>
-          <Descriptions.Item label="既往卒中">{patient.PrevStroke? '是' : '否'}</Descriptions.Item>
-          <Descriptions.Item label="服用华法林">{patient.PrevStroke? '是' : '否'}</Descriptions.Item>
-          <Descriptions.Item label='急诊收缩压(mmHg)'>{patient.SystolicPressure}</Descriptions.Item>
-          <Descriptions.Item label='疾病信息备注'>{patient.diseaseRemark}</Descriptions.Item>
+      <ProCard title="疾病信息" type="inner" bordered>
+        <Descriptions column={1} className={styles.preLine}>
+          <Descriptions.Item label="主诉" span={4}>
+            {patient.reason}
+          </Descriptions.Item>
+          <Descriptions.Item label="诊断结论" span={4}>
+            {patient.info}
+          </Descriptions.Item>
+          <Descriptions.Item label="既往脑出血">
+            {patient.PrevHemorrhage ? '否' : '是'}
+          </Descriptions.Item>
+          <Descriptions.Item label="既往卒中">{patient.PrevStroke ? '否' : '是'}</Descriptions.Item>
+          <Descriptions.Item label="服用华法林">
+            {patient.PrevStroke ? '否' : '是'}
+          </Descriptions.Item>
+          <Descriptions.Item label="急诊收缩压(mmHg)">{patient.SystolicPressure}</Descriptions.Item>
+          <Descriptions.Item label="疾病信息备注">{patient.diseaseRemark}</Descriptions.Item>
         </Descriptions>
-        <Descriptions layout='vertical' bordered>
-          <Descriptions.Item label='T(℃)'>{patient.T}</Descriptions.Item>
-          <Descriptions.Item label='P（min）'>{patient.P}</Descriptions.Item>
-          <Descriptions.Item label='R（min）'>{patient.R}</Descriptions.Item>
+        <Descriptions layout="vertical" bordered>
+          <Descriptions.Item label="T(℃)">{patient.T}</Descriptions.Item>
+          <Descriptions.Item label="P（min）">{patient.P}</Descriptions.Item>
+          <Descriptions.Item label="R（min）">{patient.R}</Descriptions.Item>
         </Descriptions>
       </ProCard>
     </ProCard>
