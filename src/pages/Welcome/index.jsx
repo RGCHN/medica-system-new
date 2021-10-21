@@ -1,14 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import dayjs from 'dayjs'
+import dayjs from 'dayjs';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Card, Typography, Col, Row, Space } from 'antd';
-import { Pie, Column, Gauge, Rose, Line} from '@ant-design/charts'
+import { Card, Col, Row, message } from 'antd';
+import { Pie, Column, Gauge, Rose, Line } from '@ant-design/charts';
 import { dayMap } from '@/pages/dataMap';
+import { getAnalyzeData } from '@/services/api';
 import styles from './index.less';
-
+import { useIntl } from 'umi';
 
 /*mock数据*/
-const genderData = [
+const mockGenderData = [
   {
     type: '男',
     value: 4544,
@@ -16,50 +17,51 @@ const genderData = [
   {
     type: '女',
     value: 3321,
-  }
+  },
 ];
-const ageData = [
+const mockAgeData = [
   {
     x: '0-10岁',
-    y: Math.floor(Math.random() * 500)
+    y: Math.floor(Math.random() * 500),
   },
   {
     x: '11-20岁',
-    y: Math.floor(Math.random() * 500)
+    y: Math.floor(Math.random() * 500),
   },
   {
     x: '21-30岁',
-    y: Math.floor(Math.random() * 1000)
+    y: Math.floor(Math.random() * 1000),
   },
   {
     x: '31-40岁',
-    y: Math.floor(Math.random() * 1000) + 100
+    y: Math.floor(Math.random() * 1000) + 100,
   },
   {
     x: '41-50岁',
-    y: Math.floor(Math.random() * 1000) + 200
-  },{
+    y: Math.floor(Math.random() * 1000) + 200,
+  },
+  {
     x: '51-60岁',
-    y: Math.floor(Math.random() * 1000) + 400
+    y: Math.floor(Math.random() * 1000) + 400,
   },
   {
     x: '61-70岁',
-    y: Math.floor(Math.random() * 1000) + 500
+    y: Math.floor(Math.random() * 1000) + 500,
   },
   {
     x: '71-80岁',
-    y: Math.floor(Math.random() * 1000) + 300
+    y: Math.floor(Math.random() * 1000) + 300,
   },
   {
     x: '大于81岁',
-    y: Math.floor(Math.random() * 1000) + 200
+    y: Math.floor(Math.random() * 1000) + 200,
   },
 ];
-const distributeData = [
+const mockDistributeData = [
   {
     x: '超急性期',
     y: 4544,
-    desc: '超急性期(0-6小时)'
+    desc: '超急性期(0-6小时)',
   },
   {
     x: '急性期',
@@ -74,44 +76,58 @@ const distributeData = [
   {
     x: '慢性期',
     y: 1231,
-    desc:'慢性期(大于2周)'
+    desc: '慢性期(大于2周)',
   },
 ];
 const now = dayjs().get('date');
-const admittedData = [
+const mockAdmittedData = [
   {
-    x: dayjs().set('date', now - 7).format('YYYY-MM-DD'),
+    x: dayjs()
+      .set('date', now - 7)
+      .format('YYYY-MM-DD'),
     y: Math.floor(Math.random() * 200),
   },
   {
-    x: dayjs().set('date', now - 6).format('YYYY-MM-DD'),
+    x: dayjs()
+      .set('date', now - 6)
+      .format('YYYY-MM-DD'),
     y: Math.floor(Math.random() * 200),
   },
   {
-    x: dayjs().set('date', now - 5).format('YYYY-MM-DD'),
+    x: dayjs()
+      .set('date', now - 5)
+      .format('YYYY-MM-DD'),
     y: Math.floor(Math.random() * 200),
   },
   {
-    x: dayjs().set('date', now - 4).format('YYYY-MM-DD'),
+    x: dayjs()
+      .set('date', now - 4)
+      .format('YYYY-MM-DD'),
     y: Math.floor(Math.random() * 200),
   },
   {
-    x: dayjs().set('date', now - 3).format('YYYY-MM-DD'),
+    x: dayjs()
+      .set('date', now - 3)
+      .format('YYYY-MM-DD'),
     y: Math.floor(Math.random() * 200),
   },
   {
-    x: dayjs().set('date', now - 2).format('YYYY-MM-DD'),
+    x: dayjs()
+      .set('date', now - 2)
+      .format('YYYY-MM-DD'),
     y: Math.floor(Math.random() * 200),
   },
   {
-    x: dayjs().set('date', now - 1).format('YYYY-MM-DD'),
+    x: dayjs()
+      .set('date', now - 1)
+      .format('YYYY-MM-DD'),
     y: Math.floor(Math.random() * 200),
   },
   {
     x: dayjs().format('YYYY-MM-DD'),
     y: Math.floor(Math.random() * 200),
   },
-]
+];
 
 export default () => {
   const dateNow = useRef('');
@@ -119,47 +135,99 @@ export default () => {
   const [gender, setGender] = useState([]);
   const [ages, setAges] = useState([]);
   const [distribute, setDistribute] = useState([]);
-  const [admitted, setAdmitted] = useState([]);
-  const [cureRate, setCureRate] = useState( Math.random());
+  const [admitted, setAdmitted] = useState(mockAdmittedData);
+  const [cureRate, setCureRate] = useState(0.68);
+  const intl = useIntl();
+
+  const fetchData = async () => {
+    const successMessage = intl.formatMessage({
+      id: 'message.success.getAnalyzeData',
+      defaultMessage: '获取统计数据成功',
+    });
+    try {
+      const res = await getAnalyzeData();
+      if (res.data.status === 'success') {
+        message.success(successMessage);
+        const genderData = Object.entries(res.data.data.sex_number).map((item) => {
+          return {
+            type: item[0] === 'manNumber' ? '男' : '女',
+            value: Number(item[1]),
+          };
+        });
+        const ageData = Object.entries(res.data.data.age).map((item) => {
+          return {
+            x: `${item[0]}岁`,
+            y: item[1],
+          };
+        });
+        const distributeData = Object.entries(res.data.data.phase).map((item) => {
+          return {
+            x: item[0],
+            y: item[1],
+            desc: item[0].slice(0, -1),
+          };
+        });
+        console.log(genderData);
+        console.log(ageData);
+        console.log(distributeData);
+
+        setGender(genderData);
+        setAges(ageData);
+        setDistribute(distributeData);
+        return;
+      }
+      message.error(res.data.msg);
+      setGender(mockGenderData);
+      setAges(mockAgeData);
+      setDistribute(mockDistributeData);
+    } catch (e) {
+      const failMessage = intl.formatMessage({
+        id: 'message.error.getAnalyzeData',
+        defaultMessage: '获取统计数据失败',
+      });
+      message.error(failMessage);
+      setGender(mockGenderData);
+      setAges(mockAgeData);
+      setDistribute(mockDistributeData);
+    }
+  };
 
   useEffect(() => {
-    /*设置日期*/
-    const now  = dayjs();
+    fetchData();
+    const now = dayjs();
     dateNow.current = now.format('YYYY-MM-DD HH:mm');
     day.current = dayMap[now.day()];
-    setGender(genderData);
-    setAges(ageData);
-    setDistribute(distributeData);
-    setAdmitted(admittedData);
-  }, [])
+  }, []);
 
   return (
     <PageContainer fixedHeader={true}>
       <div className={styles.title}>
-        <div className={styles.name}>Hi, 欢迎使用脑卒中AI辅助诊疗系统, 现在是北京时间{ dateNow.current }, 星期{day.current}</div>
-        <br/>
+        <div className={styles.name}>
+          Hi, 欢迎使用脑卒中AI辅助诊疗系统, 现在是北京时间{dateNow.current}, 星期{day.current}
+        </div>
+        <br />
         <div className={styles.desc}>轻松管理病患数据，AI辅助决策卒中梗死区域，敏捷数据看板</div>
       </div>
       <br />
       <div className={styles.cardWrapper}>
         <Row gutter={4}>
           <Col span={24}>
-            <Card title="近七日入院患者数" hoverable  bordered={false}>
+            <Card title="近七日入院患者数" hoverable bordered={false}>
               <Line
                 data={admitted}
-                padding='auto'
-                xField='x'
-                yField='y'
+                padding="auto"
+                xField="x"
+                yField="y"
                 label={{}}
                 point={{
-                    size: 4,
-                    shape: 'diamond',
-                    style: {
-                      fill: 'white',
-                      stroke: '#5B8FF9',
-                      lineWidth: 2
-                    },
-                  }}
+                  size: 4,
+                  shape: 'diamond',
+                  style: {
+                    fill: 'white',
+                    stroke: '#5B8FF9',
+                    lineWidth: 2,
+                  },
+                }}
                 legend={false}
                 state={{
                   active: {
@@ -176,18 +244,14 @@ export default () => {
           </Col>
         </Row>
         <br />
-        <Row gutter={12} >
+        <Row gutter={12}>
           <Col span={8}>
-            <Card
-              title="患者性别比例"
-              bordered={false}
-              hoverable
-            >
+            <Card title="患者性别比例" bordered={false} hoverable>
               <Pie
                 height={200}
-                data={genderData}
-                angleField='value'
-                colorField='type'
+                data={gender}
+                angleField="value"
+                colorField="type"
                 radius={0.9}
                 label={{
                   type: 'inner',
@@ -206,13 +270,12 @@ export default () => {
             </Card>
           </Col>
           <Col span={8}>
-            <Card title='患者治愈率' bordered={false} hoverable
-            >
+            <Card title="患者治愈率" bordered={false} hoverable>
               <Gauge
                 height={200}
                 percent={cureRate}
                 range={{
-                  ticks: [0,1],
+                  ticks: [0, 1],
                   color: ['l(0) 0:#B8E1FF 1:#3D76DD'],
                 }}
                 indicator={{
@@ -239,22 +302,22 @@ export default () => {
             </Card>
           </Col>
           <Col span={8}>
-            <Card title='患者卒中期' hoverable  bordered={false}>
+            <Card title="患者卒中期" hoverable bordered={false}>
               <Rose
                 height={200}
                 data={distribute}
                 label={{
                   style: {
                     fill: 'black',
-                    fontSize: 8
+                    fontSize: 8,
                   },
-                  offset: -10
+                  offset: -10,
                 }}
-                xField='x'
-                yField='y'
-                seriesField='desc'
-                radius={0.9}
-                legend={false}
+                xField="x"
+                yField="y"
+                seriesField="desc"
+                radius={1}
+                legend={{ position: 'right' }}
                 interactions={[{ type: 'element-active' }]}
               />
             </Card>
@@ -263,29 +326,29 @@ export default () => {
         <br />
         <Row gutter={4}>
           <Col span={24}>
-            <Card title="患者年龄分布" hoverable  bordered={false}>
+            <Card title="患者年龄分布" hoverable bordered={false}>
               <Column
                 data={ages}
-                xField='x'
-                yField='y'
+                xField="x"
+                yField="y"
                 label={{
                   position: 'middle',
                   style: {
                     fill: '#ffffff',
-                    opacity: 0.6
-                  }
+                    opacity: 0.6,
+                  },
                 }}
                 xAxis={{
                   label: {
                     autoHide: true,
                     autoRotate: false,
-                  }
+                  },
                 }}
                 meta={{
-                  x: { alias: '年龄范围'},
-                  y: { alias: '人数'}
+                  x: { alias: '年龄范围' },
+                  y: { alias: '人数' },
                 }}
-                theme='custom-theme'
+                theme="custom-theme"
                 interactions={[{ type: 'tooltip', enable: false }]}
               />
             </Card>

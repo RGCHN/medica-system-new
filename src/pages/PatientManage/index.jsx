@@ -98,7 +98,7 @@ export default () => {
           trigger={
             <Button type="primary">
               <EditOutlined />
-              编辑
+              修改信息
             </Button>
           }
         />
