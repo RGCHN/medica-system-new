@@ -2,8 +2,11 @@ import axios from 'axios';
 import { createBrowserHistory } from 'history';
 const history = createBrowserHistory();
 
+const managerURL = 'http://localhost:5050/api';
+const modelURL = 'http://localhost:5051/api';
+
 export const http = axios.create({
-  baseURL: 'http://localhost:5050/api',
+  baseURL: managerURL,
 });
 
 //利用拦截器添加请求头
@@ -27,6 +30,7 @@ http.interceptors.response.use(
     console.log(res.data.msg.toString());
     if (res.data.msg.toString() === 'NoLogin') {
       history.push('/user/login');
+      return;
     }
     return res;
   },
@@ -38,7 +42,7 @@ http.interceptors.response.use(
 );
 
 export const modelHttp = axios.create({
-  baseURL: 'http://10.13.81.190:5051/api',
+  baseURL: modelURL,
 });
 //利用拦截器添加请求头
 modelHttp.interceptors.request.use(
@@ -59,7 +63,8 @@ modelHttp.interceptors.response.use(
     console.log('响应');
     console.log(res);
     if (res.data.msg === 'NoLogin') {
-      history.push('/login');
+      history.push('/user/login');
+      return;
     }
     return res;
   },

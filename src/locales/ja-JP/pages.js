@@ -1,12 +1,14 @@
 export default {
   'pages.layouts.userLayout.title': '',
   'pages.login.accountLogin.tab': 'アカウントログイン',
-  'pages.login.accountLogin.errorMessage':
-    'ユーザー名/パスワードが正しくありません',
+  'pages.login.accountLogin.errorMessage': 'ユーザー名/パスワードが正しくありません',
   'pages.login.username.placeholder': 'ユーザー名',
   'pages.login.username.required': 'ユーザー名を入力してください！',
   'pages.login.password.placeholder': 'パスワード',
   'pages.login.realname.placeholder': '実際の名前',
+  'pages.login.email': '郵便',
+  'pages.login.group': 'デパートメント',
+  'pages.login.signature': 'サイン',
   'pages.login.realname.required': '本名が必要です！',
   'pages.login.password.required': 'パスワードを入力してください！',
   'pages.login.phoneLogin.tab': '電話ログイン',

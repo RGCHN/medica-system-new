@@ -1,10 +1,7 @@
-import {
-  LockOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
-import { Alert, message } from 'antd';
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { message } from 'antd';
 import React, { useState } from 'react';
-import ProForm, {  ProFormText } from '@ant-design/pro-form';
+import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { useIntl, NavLink, Link, history, FormattedMessage, SelectLang, useModel } from 'umi';
 import Footer from '@/components/Footer';
 import { register } from '@/services/api';
@@ -15,12 +12,11 @@ const Register = () => {
   const [submitting, setSubmitting] = useState(false);
   const intl = useIntl();
 
-
   const handleSubmit = async (values) => {
     setSubmitting(true);
 
     try {
-      const msg = await register({ ...values});
+      const msg = await register({ ...values });
       if (msg.data.status === 'success') {
         const defaultRegisterSuccessMessage = intl.formatMessage({
           id: 'pages.login.registerSuccess',
@@ -153,6 +149,50 @@ const Register = () => {
                 },
               ]}
             />
+            <ProFormText
+              name="email"
+              fieldProps={{
+                size: 'large',
+                prefix: <UserOutlined className={styles.prefixIcon} />,
+              }}
+              placeholder={intl.formatMessage({
+                id: 'pages.login.email',
+                defaultMessage: '邮箱',
+              })}
+            />
+            <ProFormText
+              name="phone"
+              fieldProps={{
+                size: 'large',
+                prefix: <UserOutlined className={styles.prefixIcon} />,
+              }}
+              placeholder={intl.formatMessage({
+                id: 'pages.login.phone',
+                defaultMessage: '手机号',
+              })}
+            />
+            <ProFormText
+              name="signature"
+              fieldProps={{
+                size: 'large',
+                prefix: <UserOutlined className={styles.prefixIcon} />,
+              }}
+              placeholder={intl.formatMessage({
+                id: 'pages.login.signature',
+                defaultMessage: '签名',
+              })}
+            />
+            <ProFormText
+              name="group"
+              fieldProps={{
+                size: 'large',
+                prefix: <UserOutlined className={styles.prefixIcon} />,
+              }}
+              placeholder={intl.formatMessage({
+                id: 'pages.login.group',
+                defaultMessage: '科室',
+              })}
+            />
             <div
               style={{
                 paddingBottom: 48,
@@ -162,7 +202,8 @@ const Register = () => {
                 style={{
                   float: 'right',
                 }}
-               to='/user/Login'>
+                to="/user/Login"
+              >
                 <FormattedMessage id="pages.login.loginAccount" defaultMessage="已有账号，去登录" />
               </NavLink>
             </div>

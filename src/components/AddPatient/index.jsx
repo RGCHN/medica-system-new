@@ -9,14 +9,13 @@ import ProForm, {
   ProFormDigit,
 } from '@ant-design/pro-form';
 import ProCard from '@ant-design/pro-card';
-import { useIntl, useModel } from 'umi';
+import { useIntl } from 'umi';
 import { addPatient } from '@/services/api';
 
 const DEFAULT_PATIENT = {
   recordID: '', // 病案号
   name: '',
   sex: 0,
-  age: 77,
   state: '', // 脑损伤阶段
   treatID: '', // 溶栓治疗编号
   remark: '', // 个人信息备注
@@ -31,10 +30,6 @@ const DEFAULT_PATIENT = {
   fibrillation: 0, // 房颤
   prevStroke: 0, //既往卒中
   warfarin: 0, // 是 否服用华法林
-  T: 37.2, // 体温
-  P: 77,
-  R: 12,
-  systolicPressure: 123, // 急诊收缩压
 };
 
 const AddPatient = (props) => {

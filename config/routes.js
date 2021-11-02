@@ -44,7 +44,7 @@ export default [
       {
         path: '/manage/predict',
         name: 'predict',
-        component: './ModelPredict',
+        component: './ShowPredict',
       },
       {
         path: '/manage/image',
@@ -58,9 +58,10 @@ export default [
   },
   {
     path: '/useList',
+    access: 'showUserList',
     name: 'userList',
     icon: 'cloudServer',
-    component: './UserList'
+    component: './UserList',
   },
   {
     path: '/selfCenter',

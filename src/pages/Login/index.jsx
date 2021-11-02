@@ -1,10 +1,7 @@
-import {
-  LockOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Alert, message } from 'antd';
 import React, { useState } from 'react';
-import ProForm, {  ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
+import ProForm, { ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
 import { useIntl, Link, history, FormattedMessage, SelectLang, NavLink, useModel } from 'umi';
 
 import Footer from '@/components/Footer';
@@ -26,7 +23,7 @@ const LoginMessage = ({ content }) => (
 const Login = () => {
   const [submitting, setSubmitting] = useState(false);
   const [userLoginState, setUserLoginState] = useState({});
-  const { setInitialState, initialState  } = useModel('@@initialState');
+  const { setInitialState, initialState } = useModel('@@initialState');
 
   const intl = useIntl();
 
@@ -52,7 +49,7 @@ const Login = () => {
         localStorage.setItem('access_token', msg.data.data.access_token);
         localStorage.setItem('refresh_token', msg.data.data.refresh_token);
         history.push('/welcome');
-        return ;
+        return;
       }
       message.error(msg.data.msg);
       setUserLoginState(msg);
@@ -167,7 +164,7 @@ const Login = () => {
                 <FormattedMessage id="pages.login.rememberMe" defaultMessage="自动登录" />
               </ProFormCheckbox>
               <NavLink
-                to='/user/Register'
+                to="/user/register"
                 style={{
                   float: 'right',
                 }}
