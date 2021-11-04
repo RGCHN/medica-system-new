@@ -10,7 +10,7 @@ import { NavLink } from '@umijs/preset-dumi/lib/theme';
 
 const TableList = () => {
   const [patientData, setPatientData] = useState([]);
-  const { setPatientID } = useModel('patient');
+  const { setPatientID, setCurrentPatient } = useModel('patient');
   const actionRef = useRef();
 
   const listColumns = [
@@ -112,19 +112,17 @@ const TableList = () => {
       fixed: 'right',
       width: 120,
       align: 'center',
-      render: (id) => {
+      render: (id, record) => {
         return (
           <Space
             onClick={(e) => {
               setPatientID(id);
+              setCurrentPatient(record);
             }}
           >
             <NavLink to={`manage/message`}>详情</NavLink>
             <NavLink to={`manage/predict`}>预测</NavLink>
             <NavLink to={`manage/image`}>记录</NavLink>
-            {/* <Button size='small' key='message'><NavLink  to={`manage/message`}>详细信息</NavLink></Button>
-            <Button size='small' key='predict'><NavLink to={`manage/predict`}>新建预测</NavLink></Button>
-            <Button  size='small' key='image'><NavLink to={`manage/image`}>预测记录</NavLink></Button>*/}
           </Space>
         );
       },

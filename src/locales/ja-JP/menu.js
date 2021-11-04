@@ -17,6 +17,7 @@ export default {
   'menu.exception.403': '403',
   'menu.exception.404': '404',
   'menu.exception.500': '500',
+  'menu.models': 'モデル管理',
   'menu.form': 'フォーム',
   'menu.form.basic-form': '基本フォーム',
   'menu.form.step-form': 'ステップフォーム',

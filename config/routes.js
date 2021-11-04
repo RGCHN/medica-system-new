@@ -70,6 +70,13 @@ export default [
     component: './SelfCenter',
   },
   {
+    path: '/models',
+    access: 'showUserList',
+    name: 'models',
+    icon: 'CodeOutlined',
+    component: './ModelManage',
+  },
+  {
     path: '/',
     redirect: '/welcome',
   },

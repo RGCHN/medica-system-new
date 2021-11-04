@@ -62,5 +62,5 @@ export async function analyzeImgs(body) {
 }
 
 export async function getReport(body) {
-  return modelHttp.post('getReport', body);
+  return modelHttp.post('getReport', body, { responseType: 'blob' });
 }

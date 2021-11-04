@@ -9,6 +9,7 @@ export default {
   'menu.image': '历史记录',
   'menu.predict': '模型预测',
   'menu.userList': '账号管理',
+  'menu.models': '模型管理',
   'menu.login': '登录',
   'menu.register': '注册',
   'menu.exception.403': '403',

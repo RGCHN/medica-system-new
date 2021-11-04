@@ -4,8 +4,9 @@ export default () => {
   const patientID = useRef(undefined);
   const patientData = useRef({});
 
-  const setPatientData = (data) => {
+  const setCurrentPatient = (data) => {
     patientData.current = data;
+    console.log(patientData.current);
   };
 
   const getPatientData = () => patientData.current;
@@ -15,5 +16,5 @@ export default () => {
   };
   const getPatientID = () => patientID.current;
 
-  return { setPatientID, getPatientID, getPatientData, setPatientData };
+  return { setPatientID, getPatientID, getPatientData, setCurrentPatient };
 };

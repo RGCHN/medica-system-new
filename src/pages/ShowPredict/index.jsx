@@ -1,119 +1,106 @@
-import React, { useEffect, useRef, useState } from 'react';
-import ProForm, { StepsForm, ProFormDatePicker, ProFormUploadDragger } from '@ant-design/pro-form';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { StepsForm, ProFormDatePicker } from '@ant-design/pro-form';
 import ProCard from '@ant-design/pro-card';
-import { Button, Carousel, Divider, Image, message, Space, Upload, Progress } from 'antd';
+import { Button, Divider, Image, message, Space, Upload, Progress, Typography } from 'antd';
 import dayjs from 'dayjs';
+import { useModel } from 'umi';
+import { modelHttp } from '@/request';
+import { InboxOutlined, DownloadOutlined } from '@ant-design/icons';
 import { history } from 'umi';
 import { get } from '@/utils';
-import { uploadImgs, analyzeImgs, getReport } from '@/services/api';
-import { useIntl, useModel } from 'umi';
-import { modelHttp } from '@/request';
-import { InboxOutlined } from '@ant-design/icons';
+import { analyzeImgs, getReport } from '@/services/api';
 const { Dragger } = Upload;
-
-const settings = {
-  infinite: false,
-  speed: 500,
-  slidesToShow: 6,
-  slidesToScroll: 2,
-  draggable: true,
-};
 
 const ModelPredict = () => {
   const [ADCList, setADCList] = useState([]); //ADC影像列表
   const [DWIList, setDWIList] = useState([]); //DWI影像列表
   const [ADCUpload, setADCUpload] = useState([]); //ADC表单fileList
   const [DWIUpload, setDWIUpload] = useState([]); // DWI表单filelist
-  const [uploadPercent, setUploadPercent] = useState(0); // 上传进度
   const [adcUploadPercent, setAdcUploadPercent] = useState(0); // ADC上传进度
   const [dwiUploadPercent, setDwiUploadPercent] = useState(0); //DWI上传进度
   const [ADCFilename, setADCFilename] = useState('');
   const [DWIFilename, setDWIFilename] = useState('');
   const [showProgress, setShowProgress] = useState(false);
-  const [analyzePercent, setAnalyzePercent] = useState(0);
   const [resultSize, setResultSize] = useState(0);
   const [resultInfo, setResultInfo] = useState('');
   const [predicting, setPredicting] = useState(false);
+  const [analyzePercent, setAnalyzePercent] = useState(0);
   const [nonPerfusion, setNonPerfusion] = useState([]);
   const [perfusionList, setPerfusionList] = useState([]);
   const [resultID, setResultID] = useState(undefined);
   const [uploading, setUploading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
+  const time = useRef();
   const formRef = useRef();
-  const { getPatientID } = useModel('patient');
+  const predictInterval = useRef(undefined);
+  const temp = useRef(0);
+
+  const { getPatientID, getPatientData } = useModel('patient');
   const patientID = getPatientID();
+  const currentPatient = getPatientData();
 
-  const uploadInterval = setInterval(() => {
-    const newPercent = uploadPercent + Number(Math.random().toFixed(2)) + 5;
-    if (newPercent <= 96) {
-      setUploadPercent(newPercent);
-    } else {
-      setUploadPercent(96 + Number(Math.random().toFixed(2)));
-    }
-  }, 1000);
-
-  const goPredict = (props) => {
-    setAnalyzePercent(0);
-    setPredicting(true);
-    const predictInterval = setInterval(() => {
-      if (analyzePercent <= 98) {
-        setAnalyzePercent(analyzePercent + 1);
-      } else {
-        clearInterval(predictInterval);
-      }
-    }, 2000);
-
-    analyzeImgs({
-      adc_file: ADCFilename,
-      backmodel: '0',
-      dwi_file: DWIFilename,
-      patientID: patientID,
-      // TODO 时间戳改成form的内容
-      timestamp: new Date().getTime(),
-    }).then(
-      (res) => {
-        if (predictInterval) {
-          clearInterval(predictInterval);
-        }
-        setPredicting(false);
-        setAnalyzePercent(100);
-        if (res.data.status === 'fail') {
-          message.error('输入参数有误！请重新输入');
+  const updateAnalyzePercent = useCallback(() => {
+    if (!predictInterval.current) {
+      predictInterval.current = setInterval(() => {
+        if (analyzePercent <= 98) {
+          temp.current = Math.floor((temp.current + Math.random()) * 100) / 100;
+          setAnalyzePercent(temp.current);
         } else {
-          setNonPerfusion(get(res, 'data.data.nonperf_res_imgs', []));
-          setNonPerfusion(get(res, 'data.data.perf_res_imgs', []));
-          setResultInfo(get(res, 'data.data.info', ''));
-          setResultSize(get(res, 'data.data.size', 0));
-          setResultID(get(res, 'data.data.resultID', 0));
+          clearInterval(predictInterval.current);
         }
-        setPredicting(false);
-        props?.onSubmit();
+      }, 1000);
+    }
+  }, []);
+
+  const goPredict = async (props) => {
+    setAnalyzePercent(0);
+    temp.current = 0;
+    setPredicting(true);
+    updateAnalyzePercent();
+    try {
+      const res = await analyzeImgs({
+        adc_file: ADCFilename,
+        backmodel: '0',
+        dwi_file: DWIFilename,
+        patientID: patientID,
+        timestamp: time.current,
+      });
+      if (predictInterval.current) {
+        clearInterval(predictInterval.current);
+      }
+      setPredicting(false);
+      setAnalyzePercent(100);
+      setPredicting(false);
+      if (res.data.status === 'success') {
+        setNonPerfusion(get(res, 'data.data.nonperf_res_imgs', []));
+        setPerfusionList(get(res, 'data.data.perf_res_imgs', []));
+        setResultInfo(get(res, 'data.data.info', ''));
+        setResultSize(get(res, 'data.data.size', 0));
+        setResultID(get(res, 'data.data.resultID', 0));
+        props.onSubmit();
         return true;
-      },
-      (err) => {
-        message.error('网络错误！请稍后重试！');
-        setPredicting(false);
+      } else {
+        message.error('网络错误！');
         return false;
-      },
-    );
+      }
+    } catch (e) {
+      message.error('网络错误！');
+      console.log(e);
+      return false;
+    }
   };
 
-  const getImgList = (imgData, text) => {
+  const getImgList = (imgData) => {
     if (imgData.length === 0) {
       return;
     }
     return (
-      <>
-        <div>{text}</div>
-        <Carousel {...settings}>
-          {imgData.map((item, index) => (
-            <>
-              <Image src={item} alt="" key={index} height="160px" width="160px" />
-              <div className="img-index">{index + 1}</div>
-            </>
-          ))}
-        </Carousel>
-      </>
+      <Image.PreviewGroup>
+        {imgData.map((item, index) => (
+          <Image src={item} alt="" key={index} height="160px" width="160px" />
+        ))}
+      </Image.PreviewGroup>
     );
   };
 
@@ -132,6 +119,8 @@ const ModelPredict = () => {
     setShowProgress(true);
     setUploading(true);
 
+    time.current = formRef.current.getFieldValue('date').valueOf();
+
     let adcForm = new FormData();
     ADCUpload.forEach((file) => {
       adcForm.append('file', file);
@@ -146,44 +135,72 @@ const ModelPredict = () => {
       dwiForm.append('type', 'DWI');
     });
 
-    const results = await Promise.all([
-      modelHttp.post('/imgUpload', adcForm, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        onUploadProgress: (progressEvent) => {
-          setAdcUploadPercent(((progressEvent.loaded / progressEvent.total) * 100) | 0);
-          console.log(adcUploadPercent);
-        },
-      }),
-      modelHttp.post('/imgUpload', dwiForm, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        onUploadProgress: (progressEvent) => {
-          setDwiUploadPercent(((progressEvent.loaded / progressEvent.total) * 100) | 0);
-          console.log(dwiUploadPercent);
-        },
-      }),
-    ]);
-
-    clearInterval(uploadInterval);
-    const adcResult = results[0];
-    const dwiResult = results[1];
-    if (adcResult.data.status === 'success' && dwiResult.data.status === 'success') {
-      setUploadPercent(100);
-      setADCList(get(adcResult, 'data.data.imgs', []));
-      setADCFilename(get(adcResult, 'data.data.filename', []));
-      setDWIList(get(dwiResult, 'data.data.imgs', []));
-      setDWIFilename(get(dwiResult, 'data.data.filename', []));
-      message.success('上传成功！');
-      setUploading(false);
-      props.onSubmit?.();
-      return true;
-    } else {
+    try {
+      const results = await Promise.all([
+        modelHttp.post('/imgUpload', adcForm, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          onUploadProgress: (progressEvent) => {
+            setAdcUploadPercent(((progressEvent.loaded / progressEvent.total) * 100) | 0);
+          },
+        }),
+        modelHttp.post('/imgUpload', dwiForm, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          onUploadProgress: (progressEvent) => {
+            setDwiUploadPercent(((progressEvent.loaded / progressEvent.total) * 100) | 0);
+          },
+        }),
+      ]);
+      const adcResult = results[0];
+      const dwiResult = results[1];
+      if (adcResult.data.status === 'success' && dwiResult.data.status === 'success') {
+        setADCList(get(adcResult, 'data.data.imgs', []));
+        setADCFilename(get(adcResult, 'data.data.filename', []));
+        setDWIList(get(dwiResult, 'data.data.imgs', []));
+        setDWIFilename(get(dwiResult, 'data.data.filename', []));
+        message.success('上传成功！');
+        setUploading(false);
+        props.onSubmit();
+        return true;
+      } else {
+        message.error('网络错误！请稍后重试！');
+        setUploading(false);
+        return false;
+      }
+    } catch (e) {
+      console.log(e);
       message.error('网络错误！请稍后重试！');
-      setUploading(false);
       return false;
+    }
+  };
+
+  const downloadReport = async () => {
+    setDownloading(true);
+    try {
+      const res = await getReport({
+        resultID: resultID,
+      });
+      const blob = new Blob([res.data], {
+        type: 'application/pdf',
+      });
+      const objectUrl = URL.createObjectURL(blob);
+      const aLink = document.createElement('a');
+      aLink.style.display = 'none';
+      aLink.href = objectUrl;
+      aLink.download = `辅助诊断报告-${currentPatient.name}-${dayjs(time.current).format(
+        'YYYY-MM-DD',
+      )}`;
+      document.body.appendChild(aLink);
+      aLink.click();
+      document.body.removeChild(aLink);
+      setDownloading(false);
+    } catch (e) {
+      setDownloading(false);
+      message.error('发生错误！请稍后重试');
+      console.log(e);
     }
   };
 
@@ -191,11 +208,10 @@ const ModelPredict = () => {
     if (!patientID) {
       history.push('/list');
     }
-    console.log(patientID);
   }, [patientID]);
 
   return (
-    <ProCard>
+    <ProCard title={`当前病人:  ${currentPatient.name}`}>
       <StepsForm
         formRef={formRef}
         formProps={{
@@ -205,10 +221,10 @@ const ModelPredict = () => {
         }}
         submitter={{
           render: (props) => {
-            if (props.step === 0) {
+            const { step } = props;
+            if (step === 0) {
               return (
-                <>
-                  <Space />
+                <ProCard>
                   <Button
                     type="primary"
                     onClick={() => handleUpload(props)}
@@ -217,22 +233,33 @@ const ModelPredict = () => {
                   >
                     上传数据
                   </Button>
-                </>
+                </ProCard>
               );
             }
-            if (props.step === 1) {
+            if (step === 1) {
               return (
-                <Button type="primary" onClick={() => goPredict(props)}>
-                  开始分割
-                </Button>
+                <ProCard>
+                  <Button type="primary" onClick={() => goPredict(props)} loading={predicting}>
+                    {predicting ? '正在分割' : '开始分割'}
+                  </Button>
+                </ProCard>
               );
             }
-            return [
-              <Button key="gotoTwo">{'<'} 返回第二步</Button>,
-              <Button type="primary" key="goToTree">
-                提交
-              </Button>,
-            ];
+            if (step === 2) {
+              return (
+                <ProCard>
+                  <Button
+                    key="download"
+                    type="primary"
+                    onClick={downloadReport}
+                    icon={<DownloadOutlined />}
+                    loading={downloading}
+                  >
+                    {downloading ? '正在下载' : '辅助诊疗报告下载'}
+                  </Button>
+                </ProCard>
+              );
+            }
           },
         }}
       >
@@ -263,14 +290,18 @@ const ModelPredict = () => {
             <p className="ant-upload-text">点击或拖拽文件上传</p>
             <p className="ant-upload-hint">选择ADC影像</p>
           </Dragger>
-          <Progress
-            strokeColor={{
-              '0%': '#108ee9',
-              '100%': '#87d068',
-            }}
-            percent={adcUploadPercent}
-          />
+          {showProgress && (
+            <Progress
+              strokeColor={{
+                '0%': '#108ee9',
+                '100%': '#87d068',
+              }}
+              percent={adcUploadPercent}
+            />
+          )}
+
           <Divider>DWI影像上传</Divider>
+          <Space direction="vertical" />
           <Dragger
             label="选择DWI影像文件"
             name="DWI"
@@ -285,24 +316,25 @@ const ModelPredict = () => {
             <p className="ant-upload-text">点击或拖拽文件上传</p>
             <p className="ant-upload-hint">选择ADC影像</p>
           </Dragger>
-          <Progress
-            strokeColor={{
-              '0%': '#108ee9',
-              '100%': '#87d068',
-            }}
-            percent={dwiUploadPercent}
-          />
+          {showProgress && (
+            <Progress
+              strokeColor={{
+                '0%': '#108ee9',
+                '100%': '#87d068',
+              }}
+              percent={dwiUploadPercent}
+            />
+          )}
         </StepsForm.StepForm>
-        <StepsForm.StepForm
-          name="analyze"
-          title="AI模型预测"
-          onFinish={async () => {
-            return true;
-          }}
-        >
-          {getImgList(ADCList, '【ADC影像】')}
-          {getImgList(DWIList, '【DWI影像】')}
-          <div>【模型分析进度】</div>
+        <StepsForm.StepForm name="analyze" title="AI模型预测">
+          <ProCard title="ADC影像" headerBordered collapsible>
+            {getImgList(ADCList)}
+          </ProCard>
+          <ProCard title="DWI影像" headerBordered collapsible>
+            {getImgList(DWIList)}
+          </ProCard>
+
+          <div>【模型分割进度】</div>
           <Progress
             strokeColor={{
               '0%': '#108ee9',
@@ -312,9 +344,12 @@ const ModelPredict = () => {
           />
         </StepsForm.StepForm>
         <StepsForm.StepForm name="result" title="结果查看">
-          <Button type="primary mr-3" onClick={getReport}>
-            下载生成辅助报告
-          </Button>
+          <ProCard title="血管再通最终梗死区预测" headerBordered collapsible>
+            {getImgList(perfusionList)}
+          </ProCard>
+          <ProCard title="血管未再通梗死区预测" headerBordered collapsible>
+            {getImgList(nonPerfusion)}
+          </ProCard>
         </StepsForm.StepForm>
       </StepsForm>
     </ProCard>
