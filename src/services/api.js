@@ -64,3 +64,7 @@ export async function analyzeImgs(body) {
 export async function getReport(body) {
   return modelHttp.post('getReport', body, { responseType: 'blob' });
 }
+
+export async function getHistoryResults(body) {
+  return modelHttp.post('/getResultsByPatient', body);
+}

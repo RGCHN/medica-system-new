@@ -57,6 +57,13 @@ export default [
     ],
   },
   {
+    path: '/models',
+    access: 'showUserList',
+    name: 'models',
+    icon: 'CodeOutlined',
+    component: './ModelManage',
+  },
+  {
     path: '/useList',
     access: 'showUserList',
     name: 'userList',
@@ -68,13 +75,6 @@ export default [
     name: 'selfCenter',
     icon: 'team',
     component: './SelfCenter',
-  },
-  {
-    path: '/models',
-    access: 'showUserList',
-    name: 'models',
-    icon: 'CodeOutlined',
-    component: './ModelManage',
   },
   {
     path: '/',

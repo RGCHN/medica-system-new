@@ -155,10 +155,6 @@ const TableList = () => {
         columns={listColumns}
         actionRef={actionRef}
         dataSource={patientData}
-        columnsState={{
-          persistenceKey: 'pro-table-singe-demos',
-          persistenceType: 'localStorage',
-        }}
         rowKey="id"
         search={false}
         pagination={{
