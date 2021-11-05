@@ -167,9 +167,6 @@ export default () => {
             desc: item[0].slice(0, -1),
           };
         });
-        console.log(genderData);
-        console.log(ageData);
-        console.log(distributeData);
 
         setGender(genderData);
         setAges(ageData);

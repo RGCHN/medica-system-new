@@ -68,3 +68,7 @@ export async function getReport(body) {
 export async function getHistoryResults(body) {
   return modelHttp.post('/getResultsByPatient', body);
 }
+
+export async function getPerfImgs(body) {
+  return modelHttp.post('/getPerfImgs', body);
+}

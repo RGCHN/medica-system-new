@@ -211,7 +211,7 @@ const ModelPredict = () => {
   }, [patientID]);
 
   return (
-    <ProCard title={`当前病人:  ${currentPatient.name}`}>
+    <ProCard title="新建模型预测" extra={`当前病人:  ${currentPatient.name}`}>
       <StepsForm
         formRef={formRef}
         formProps={{
