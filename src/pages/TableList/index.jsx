@@ -6,7 +6,7 @@ import { getPatientList } from '@/services/api';
 import AddPatient from '@/components/AddPatient';
 import { PlusOutlined } from '@ant-design/icons';
 import { Button, Space } from 'antd';
-import { NavLink } from '@umijs/preset-dumi/lib/theme';
+import { NavLink } from 'umi';
 
 const TableList = () => {
   const [patientData, setPatientData] = useState([]);
