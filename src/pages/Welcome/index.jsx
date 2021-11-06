@@ -140,14 +140,9 @@ export default () => {
   const intl = useIntl();
 
   const fetchData = async () => {
-    const successMessage = intl.formatMessage({
-      id: 'message.success.getAnalyzeData',
-      defaultMessage: '获取统计数据成功',
-    });
     try {
       const res = await getAnalyzeData();
       if (res.data.status === 'success') {
-        message.success(successMessage);
         const genderData = Object.entries(res.data.data.sex_number).map((item) => {
           return {
             type: item[0] === 'manNumber' ? '男' : '女',

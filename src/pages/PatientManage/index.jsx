@@ -57,13 +57,8 @@ export default () => {
         patientID: id,
       });
       if (res.data.status === 'success') {
-        const successMessage = intl.formatMessage({
-          id: 'message.success.getPatient',
-          defaultMessage: '获取病人信息成功！',
-        });
         setPatient(res.data.data.patient);
         setPatientData(res.data.data.patient);
-        message.success(successMessage);
         return;
       }
       message.error(res.data.msg);
