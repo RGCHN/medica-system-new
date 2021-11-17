@@ -4,13 +4,13 @@ import { Empty } from 'antd';
 import './index.scss';
 
 const data = [
-  { time: '2020-05-12', size: 20.78 },
-  { time: '2020-05-20', size: 16.33 },
-  { time: '2020-06-12', size: 12.78 },
-  { time: '2020-06-18', size: 12.55 },
-  { time: '2020-06-22', size: 12.34 },
-  { time: '2020-07-01', size: 12.05 },
-  { time: '2020-07-10', size: 11.89 },
+  { time: '2020-05-12', size: 20 + Math.random() },
+  { time: '2020-05-20', size: 16 + Math.random() },
+  { time: '2020-06-12', size: 14 + Math.random() },
+  { time: '2020-06-18', size: 12 + Math.random() },
+  { time: '2020-06-22', size: 12 + Math.random() },
+  { time: '2020-07-01', size: 12 + Math.random() },
+  { time: '2020-07-10', size: 11 + Math.random() },
 ];
 const defaultConfig = {
   padding: 'auto',

@@ -6,7 +6,6 @@ export default () => {
 
   const setCurrentPatient = (data) => {
     patientData.current = data;
-    console.log(patientData.current);
   };
 
   const getPatientData = () => patientData.current;

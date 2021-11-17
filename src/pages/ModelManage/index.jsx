@@ -49,7 +49,7 @@ const DEFAULT_MODELS = [
       sensitive: '0.812',
       AUC: '0.920',
     },
-    desc: '针对CT灌注多模态影像，模型想能和MMI-Net接近',
+    desc: '针对CT灌注多模态影像，模型性能和MMI-Net接近',
     params: {
       learningRate: '',
       batchSize: '',

@@ -1,24 +1,25 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { useModel } from 'umi';
+import { useModel, useIntl } from 'umi';
 import ProTable from '@ant-design/pro-table';
 import { getPatientList } from '@/services/api';
 import AddPatient from '@/components/AddPatient';
-import { PlusOutlined } from '@ant-design/icons';
-import { Button, Space } from 'antd';
+import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { Button, message, Space } from 'antd';
 import { NavLink } from 'umi';
 
 const TableList = () => {
   const [patientData, setPatientData] = useState([]);
   const { setPatientID, setCurrentPatient } = useModel('patient');
   const actionRef = useRef();
+  const intl = useIntl();
 
   const listColumns = [
     {
       title: '姓名',
       dataIndex: 'name',
       copyable: true,
-      width: 80,
+      width: 100,
       fixed: 'left',
       key: 'name',
     },
@@ -141,7 +142,17 @@ const TableList = () => {
       setPatientData([]);
     } catch (error) {
       setPatientData([]);
+      const defaultLoginFailureMessage = intl.formatMessage({
+        id: 'app.error.network',
+        defaultMessage: '网络连接错误！',
+      });
+      message.error(defaultLoginFailureMessage);
     }
+  }, []);
+
+  const handleReload = useCallback(() => {
+    console.log('点击刷新按钮');
+    getPatients();
   }, []);
 
   useEffect(() => {
@@ -164,6 +175,7 @@ const TableList = () => {
         toolBarRender={() => [
           <AddPatient
             key="add"
+            finishCallback={handleReload}
             title="新建病患记录"
             trigger={
               <Button type="primary">
@@ -178,6 +190,7 @@ const TableList = () => {
           density: false,
           fullScreen: true,
           setting: true,
+          reload: handleReload,
         }}
       />
     </PageContainer>

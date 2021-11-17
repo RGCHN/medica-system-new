@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Carousel, Collapse, message, Image, Empty } from 'antd';
 import { get } from '@/utils';
-import { useModel } from 'umi';
+import { useModel, useIntl } from 'umi';
 import ProCard from '@ant-design/pro-card';
 import { getPerfImgs } from '@/services/api';
 
@@ -19,6 +19,7 @@ const RoiRegion = () => {
   const [loading, setLoading] = useState(true);
   const { getPatientID } = useModel('patient');
   const patientID = getPatientID();
+  const intl = useIntl();
 
   const getData = useCallback(async () => {
     try {
@@ -35,9 +36,13 @@ const RoiRegion = () => {
         setLoading(false);
         return;
       }
-      message.error('网络错误！请稍后重试！');
+      message.error(res.data.msg);
     } catch (e) {
-      message.error('网络错误！请稍后重试！');
+      const defaultLoginFailureMessage = intl.formatMessage({
+        id: 'app.error.network',
+        defaultMessage: '网络连接错误！',
+      });
+      message.error(defaultLoginFailureMessage);
       console.log(e);
     }
     setLoading(false);

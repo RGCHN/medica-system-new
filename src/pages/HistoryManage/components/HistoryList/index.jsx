@@ -3,7 +3,7 @@ import { Collapse, Empty, Image, message, Space, Tag } from 'antd';
 import ProList from '@ant-design/pro-list';
 import { getHistoryResults, getReport } from '@/services/api';
 import { get } from '@/utils';
-import { useModel } from 'umi';
+import { useModel, useIntl } from 'umi';
 
 const { Panel } = Collapse;
 
@@ -16,6 +16,7 @@ const HistoryList = () => {
   const { getPatientData, getPatientID } = useModel('patient');
   const currentPatient = getPatientData();
   const patientID = getPatientID();
+  const intl = useIntl();
 
   const getHistory = useCallback(async () => {
     try {
@@ -41,10 +42,14 @@ const HistoryList = () => {
         setSpining(false);
         return;
       }
-      message.error('网络错误，请稍后重试!');
+      message.error(res.data.msg);
     } catch (e) {
       console.log(e);
-      message.error('网络错误，请稍后重试!');
+      const defaultLoginFailureMessage = intl.formatMessage({
+        id: 'app.error.network',
+        defaultMessage: '网络连接错误！',
+      });
+      message.error(defaultLoginFailureMessage);
     }
   }, [patientID]);
 
@@ -72,7 +77,11 @@ const HistoryList = () => {
       setDownloading(false);
     } catch (e) {
       setDownloading(false);
-      message.error('发生错误！请稍后重试');
+      const defaultLoginFailureMessage = intl.formatMessage({
+        id: 'app.error.network',
+        defaultMessage: '网络连接错误！',
+      });
+      message.error(defaultLoginFailureMessage);
       console.log(e);
     }
   };
@@ -85,7 +94,7 @@ const HistoryList = () => {
       <Image.PreviewGroup>
         <Space wrap>
           {imgData.map((item, index) => (
-            <Image src={item} alt="" key={index} height="50px" width="50px" />
+            <Image src={item} alt="" key={index} height="80px" width="80px" />
           ))}
         </Space>
       </Image.PreviewGroup>
@@ -108,9 +117,7 @@ const HistoryList = () => {
           render: (text, record) => (
             <Space>
               <Tag color="blue">{record.time}</Tag>
-              <Tag color="geekblue">
-                梗死区域面积: {record.resultInfo}, 占比{(record.resultSize / 100).toFixed(2)}%
-              </Tag>
+              <Tag color="geekblue">梗死区域占比{(record.resultSize / 100).toFixed(2)}%</Tag>
               <Tag color="green" onClick={() => downloadReport(record)}>
                 下载辅助报告
               </Tag>
@@ -127,11 +134,11 @@ const HistoryList = () => {
                 <Panel key="DWI" header="DWI影像">
                   {getImgList(record.DWIList)}
                 </Panel>
-                <Panel key="nonPerfusion" header="不溶栓梗死区预测">
-                  {getImgList(record.nonPerfusion)}
-                </Panel>
-                <Panel key="perfusion" header="溶栓后梗死区预测">
+                <Panel key="perfusion" header="梗死区分割结果">
                   {getImgList(record.perfusionList)}
+                </Panel>
+                <Panel key="nonPerfusion" header="梗死区发展预测">
+                  {getImgList(record.nonPerfusion)}
                 </Panel>
               </Collapse>
             );

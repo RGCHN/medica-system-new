@@ -1,44 +1,45 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { message } from "antd";
+import { message } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import { EditableProTable } from '@ant-design/pro-table';
 import { getUserList, updateRole, deleteUser } from '@/services/api';
 import { roleMap } from '@/pages/dataMap';
-
+import { useIntl } from 'umi';
 const UserList = () => {
   const [userData, setUserData] = useState([]);
   const [editableKeys, setEditableRowKeys] = useState([]);
+  const intl = useIntl();
   const columns = [
     {
       title: 'ID',
       dataIndex: 'id',
-      key:'id',
-      editable: false
+      key: 'id',
+      editable: false,
     },
     {
       title: '姓名',
       dataIndex: 'name',
-      key:'name',
-      editable: false
+      key: 'name',
+      editable: false,
     },
     {
       title: '权限',
       dataIndex: 'role',
-      key:'role',
+      key: 'role',
       valueType: 'select',
       valueEnum: {
-        "管理员": {
+        管理员: {
           text: '管理员',
           status: 'Processing',
         },
-        "主任医生": {
+        主任医生: {
           text: '主任医生',
           status: 'Success',
         },
-        "医生": {
+        医生: {
           text: '医生',
-          status: 'Warning'
-        }
+          status: 'Warning',
+        },
       },
     },
     {
@@ -46,14 +47,20 @@ const UserList = () => {
       valueType: 'option',
       width: 200,
       render: (text, record, index, action) => [
-        <a key="editable" onClick={() => {
-          action?.startEditable?.(record.id);
-        }}>
+        <a
+          key="editable"
+          onClick={() => {
+            action?.startEditable?.(record.id);
+          }}
+        >
           修改权限
         </a>,
-        <a key="delete" onClick={() => {
-          handleDelete(index, record)
-        }}>
+        <a
+          key="delete"
+          onClick={() => {
+            handleDelete(index, record);
+          }}
+        >
           删除
         </a>,
       ],
@@ -62,49 +69,55 @@ const UserList = () => {
 
   const handleUpdateRole = useCallback(async (rowKey, data) => {
     const { id, role } = data;
-    const res =  await updateRole({
+    const res = await updateRole({
       userID: id,
-      role: roleMap[role]
-    })
+      role: roleMap[role],
+    });
     if (res.data.status === 'success') {
       setUserData(res.data.data.userInfo);
       message.success(res.data.msg);
     } else {
-      message.error(res.data.msg);
+      const defaultLoginFailureMessage = intl.formatMessage({
+        id: 'app.error.network',
+        defaultMessage: '网络连接错误！',
+      });
+      message.error(defaultLoginFailureMessage);
     }
   }, []);
 
   const handleDelete = useCallback(async (rowKey, data) => {
     const { id } = data;
     const res = await deleteUser({
-      userID: id
-    })
+      userID: id,
+    });
     if (res.data.status === 'success') {
       setUserData(res.data.data.userInfo);
-      message.success(res.data.msg);
     } else {
-      message.error(res.data.msg);
+      const defaultLoginFailureMessage = intl.formatMessage({
+        id: 'app.error.network',
+        defaultMessage: '网络连接错误！',
+      });
+      message.error(defaultLoginFailureMessage);
     }
-  }, [])
+  }, []);
 
   const getUsers = useCallback(async () => {
     try {
       const res = await getUserList();
       if (res.data.status === 'success') {
         setUserData(res.data.data.userInfo);
-        return ;
+        return;
       }
       message.error(res.data.msg);
       setUserData([]);
     } catch (e) {
       setUserData([]);
     }
-
-  }, [])
+  }, []);
 
   useEffect(() => {
     getUsers();
-  }, [])
+  }, []);
 
   return (
     <PageContainer>
@@ -120,11 +133,10 @@ const UserList = () => {
           onChange: setEditableRowKeys,
           onDelete: handleDelete,
           onSave: handleUpdateRole,
-        }}/>
+        }}
+      />
     </PageContainer>
-  )
-}
+  );
+};
 
 export default UserList;
-
-

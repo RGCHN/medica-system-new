@@ -3,10 +3,9 @@ import { StepsForm, ProFormDatePicker } from '@ant-design/pro-form';
 import ProCard from '@ant-design/pro-card';
 import { Button, Divider, Image, message, Space, Upload, Progress, Typography } from 'antd';
 import dayjs from 'dayjs';
-import { useModel } from 'umi';
+import { useModel, history, useIntl } from 'umi';
 import { modelHttp } from '@/request';
 import { InboxOutlined, DownloadOutlined } from '@ant-design/icons';
-import { history } from 'umi';
 import { get } from '@/utils';
 import { analyzeImgs, getReport } from '@/services/api';
 const { Dragger } = Upload;
@@ -30,6 +29,7 @@ const ModelPredict = () => {
   const [resultID, setResultID] = useState(undefined);
   const [uploading, setUploading] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const intl = useIntl();
 
   const time = useRef();
   const formRef = useRef();
@@ -81,7 +81,11 @@ const ModelPredict = () => {
         props.onSubmit();
         return true;
       } else {
-        message.error('网络错误！');
+        const defaultLoginFailureMessage = intl.formatMessage({
+          id: 'app.error.network',
+          defaultMessage: '网络连接错误！',
+        });
+        message.error(defaultLoginFailureMessage);
         return false;
       }
     } catch (e) {
@@ -172,7 +176,11 @@ const ModelPredict = () => {
       }
     } catch (e) {
       console.log(e);
-      message.error('网络错误！请稍后重试！');
+      const defaultLoginFailureMessage = intl.formatMessage({
+        id: 'app.error.network',
+        defaultMessage: '网络连接错误！',
+      });
+      message.error(defaultLoginFailureMessage);
       return false;
     }
   };
@@ -199,7 +207,11 @@ const ModelPredict = () => {
       setDownloading(false);
     } catch (e) {
       setDownloading(false);
-      message.error('发生错误！请稍后重试');
+      const defaultLoginFailureMessage = intl.formatMessage({
+        id: 'app.error.network',
+        defaultMessage: '网络连接错误！',
+      });
+      message.error(defaultLoginFailureMessage);
       console.log(e);
     }
   };
@@ -240,7 +252,7 @@ const ModelPredict = () => {
               return (
                 <ProCard>
                   <Button type="primary" onClick={() => goPredict(props)} loading={predicting}>
-                    {predicting ? '正在分割' : '开始分割'}
+                    {predicting ? '正在分析' : '开始分析'}
                   </Button>
                 </ProCard>
               );
@@ -334,7 +346,7 @@ const ModelPredict = () => {
             {getImgList(DWIList)}
           </ProCard>
 
-          <div>【模型分割进度】</div>
+          <div>【模型计算进度】</div>
           <Progress
             strokeColor={{
               '0%': '#108ee9',
@@ -344,10 +356,10 @@ const ModelPredict = () => {
           />
         </StepsForm.StepForm>
         <StepsForm.StepForm name="result" title="结果查看">
-          <ProCard title="血管再通最终梗死区预测" headerBordered collapsible>
+          <ProCard title="梗死区分割结果" headerBordered collapsible>
             {getImgList(perfusionList)}
           </ProCard>
-          <ProCard title="血管未再通梗死区预测" headerBordered collapsible>
+          <ProCard title="梗死区发展预测" headerBordered collapsible>
             {getImgList(nonPerfusion)}
           </ProCard>
         </StepsForm.StepForm>

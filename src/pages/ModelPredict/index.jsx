@@ -4,7 +4,7 @@ import ProCard from '@ant-design/pro-card';
 import { Divider, message } from 'antd';
 import { waitTime } from '@/utils';
 import dayjs from 'dayjs';
-import { useModel } from 'umi';
+import { useModel, useIntl } from 'umi';
 
 const ModelPredict = (props) => {
   const [CBFList, setCBFList] = useState([]);

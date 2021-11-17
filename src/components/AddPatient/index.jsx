@@ -33,7 +33,7 @@ const DEFAULT_PATIENT = {
 };
 
 const AddPatient = (props) => {
-  const { title = '', trigger, defaultData = DEFAULT_PATIENT } = props;
+  const { title = '', trigger, defaultData = DEFAULT_PATIENT, finishCallback = () => {} } = props;
   const formRef = useRef();
   const intl = useIntl();
 
@@ -52,6 +52,7 @@ const AddPatient = (props) => {
       });
       if (res.data.status === 'success') {
         message.success(defaultSuccessMessage);
+        typeof finishCallback === 'function' && finishCallback();
       } else {
         message.error(defaultErrorMessage);
       }
@@ -230,10 +231,15 @@ const AddPatient = (props) => {
               { label: '是', value: 1 },
             ]}
           />
-          <ProFormDigit name="T" width="md" label="T(℃)" />
-          <ProFormDigit name="P" width="md" label="P(min)" />
-          <ProFormDigit name="R" width="md" label="R(min)" />
-          <ProFormDigit name="systolicPressure" width="md" label="急诊收缩压(mmHg)" />
+          <ProFormDigit name="T" width="md" label="T(℃)" rules={[{ required: true }]} />
+          <ProFormDigit name="P" width="md" label="P(min)" rules={[{ required: true }]} />
+          <ProFormDigit name="R" width="md" label="R(min)" rules={[{ required: true }]} />
+          <ProFormDigit
+            name="systolicPressure"
+            width="md"
+            label="急诊收缩压(mmHg)"
+            rules={[{ required: true }]}
+          />
           <ProFormTextArea
             name="diseaseRemark"
             width="lg"

@@ -12,9 +12,7 @@ export default {
   'layout.user.link.privacy': 'Privacy',
   'layout.user.link.terms': 'Terms',
   'app.copyright.produced': 'Produced by ZheJiang University',
-  'app.preview.down.block': 'Download this page to your local project',
-  'app.welcome.link.fetch-blocks': 'Get all block',
-  'app.welcome.link.block-list': 'Quickly build standard, pages based on `block` development',
+  'app.error.network': 'Network Connection Error',
   ...globalHeader,
   ...menu,
   ...settingDrawer,
@@ -22,5 +20,5 @@ export default {
   ...pwa,
   ...component,
   ...pages,
-  ...messages
+  ...messages,
 };

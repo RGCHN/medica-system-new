@@ -33,11 +33,11 @@ const Register = () => {
       });
       message.error(`${defaultRegisterFailMessage}！${JSON.stringify(msg.data.username[0])}`);
     } catch (error) {
-      const defaultRegisterFailMessage = intl.formatMessage({
-        id: 'pages.login.registerFail',
-        defaultMessage: '注册失败！',
+      const defaultLoginFailureMessage = intl.formatMessage({
+        id: 'app.error.network',
+        defaultMessage: '网络连接错误！',
       });
-      message.error(defaultRegisterFailMessage);
+      message.error(defaultLoginFailureMessage);
     }
     setSubmitting(false);
   };

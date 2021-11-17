@@ -36,6 +36,7 @@ export async function getInitialState() {
   }
   return {
     fetchUserInfo,
+    currentUser: undefined,
     settings: {},
   };
 }

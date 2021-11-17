@@ -45,9 +45,9 @@ const Login = () => {
           defaultMessage: '登录成功！',
         });
         message.success(defaultLoginSuccessMessage);
-        await fetchUserInfo();
         localStorage.setItem('access_token', msg.data.data.access_token);
         localStorage.setItem('refresh_token', msg.data.data.refresh_token);
+        await fetchUserInfo();
         history.push('/welcome');
         return;
       }
@@ -55,8 +55,8 @@ const Login = () => {
       setUserLoginState(msg);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
-        id: 'pages.login.accountLogin.errorMessage',
-        defaultMessage: '错误的用户名或密码！',
+        id: 'app.error.network',
+        defaultMessage: '网络连接错误！',
       });
       message.error(defaultLoginFailureMessage);
     }

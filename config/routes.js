@@ -58,7 +58,7 @@ export default [
   },
   {
     path: '/models',
-    access: 'showUserList',
+    access: 'showModelList',
     name: 'models',
     icon: 'CodeOutlined',
     component: './ModelManage',

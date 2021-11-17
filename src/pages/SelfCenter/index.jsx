@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
 import { Avatar, Descriptions, message } from 'antd';
 import ProCard from '@ant-design/pro-card';
-import { useModel } from 'umi';
+import { useModel, useIntl } from 'umi';
 import { getUserDetail } from '@/services/api';
 import styles from './index.less';
 import { ContactsOutlined, ReconciliationOutlined, SolutionOutlined } from '@ant-design/icons';
@@ -11,6 +11,7 @@ const SelfCenter = () => {
   const { initialState } = useModel('@@initialState');
   const [userData, setUserData] = useState(null);
   const { currentUser } = initialState;
+  const intl = useIntl();
 
   useEffect(() => {
     if (!currentUser) {
@@ -29,7 +30,13 @@ const SelfCenter = () => {
         setUserData(null);
       },
       (err) => {
+        const defaultLoginFailureMessage = intl.formatMessage({
+          id: 'app.error.network',
+          defaultMessage: '网络连接错误！',
+        });
+        message.error(defaultLoginFailureMessage);
         setUserData(null);
+        console.log(err);
       },
     );
   }, []);

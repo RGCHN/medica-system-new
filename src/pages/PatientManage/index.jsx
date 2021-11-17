@@ -45,12 +45,7 @@ export default () => {
 
   const getPatientDetail = useCallback(async () => {
     if (!id) {
-      const failMessage = intl.formatMessage({
-        id: 'message.error.getPatient',
-        defaultMessage: '获取病人信息失败！',
-      });
-      message.error(failMessage);
-      return;
+      return true;
     }
     try {
       const res = await getPatientByID({
@@ -59,17 +54,14 @@ export default () => {
       if (res.data.status === 'success') {
         setPatient(res.data.data.patient);
         setPatientData(res.data.data.patient);
-        return;
+      } else {
+        message.error(res.data.msg);
+        setPatient({});
       }
-      message.error(res.data.msg);
-      setPatient({});
     } catch (e) {
-      const failMessage = intl.formatMessage({
-        id: 'message.error.getPatient',
-        defaultMessage: '获取病人信息失败！',
-      });
-      message.error(failMessage);
+      console.log(e);
     }
+    return true;
   }, [id]);
 
   useEffect(() => {
