@@ -65,6 +65,8 @@ export default () => {
   }, [id]);
 
   useEffect(() => {
+    console.log('patient id');
+    console.log(id);
     getPatientDetail();
   }, []);
 

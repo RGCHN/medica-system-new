@@ -11,6 +11,9 @@ export default () => {
   const getPatientData = () => patientData.current;
 
   const setPatientID = (id) => {
+    if (!id) {
+      return;
+    }
     patientID.current = id;
   };
   const getPatientID = () => patientID.current;

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { PageContainer } from '@ant-design/pro-layout';
-import { Avatar, Descriptions, message } from 'antd';
+import { Avatar, Descriptions, message, Row, Col, Space, Button } from 'antd';
 import ProCard from '@ant-design/pro-card';
+import ProForm, { ProFormText } from '@ant-design/pro-form';
 import { useModel, useIntl } from 'umi';
 import { getUserDetail } from '@/services/api';
 import styles from './index.less';
@@ -71,7 +72,25 @@ const SelfCenter = () => {
               <Descriptions.Item label="邮箱地址">{userData.email}</Descriptions.Item>
               <Descriptions.Item label="手机号">{userData.phone}</Descriptions.Item>
             </Descriptions>
+            <ProForm
+              onFinish={async (value) => console.log(value)}
+              submitter={{
+                render: (props, doms) => {
+                  return [
+                    <Button type="primary" key="rest" onClick={() => props.form?.resetFields()}>
+                      提交新密码
+                    </Button>,
+                    <Button type="button" key="submit" onClick={() => props.form?.submit?.()}>
+                      重置
+                    </Button>,
+                  ];
+                },
+              }}
+            >
+              <ProFormText.Password width="md" name="password" label="密码" />
+            </ProForm>
           </ProCard>
+          <Button type="primary">修改信息</Button>
         </ProCard>
       )}
     </PageContainer>

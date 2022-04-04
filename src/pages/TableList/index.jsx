@@ -109,15 +109,16 @@ const TableList = () => {
     {
       title: '操作',
       dataIndex: 'id',
-      key: 'action',
+      key: 'option',
+      valueType: 'option',
       fixed: 'right',
       width: 120,
       align: 'center',
-      render: (id, record) => {
+      render: (node, record) => {
         return (
           <Space
             onClick={(e) => {
-              setPatientID(id);
+              setPatientID(record.id);
               setCurrentPatient(record);
             }}
           >
@@ -150,10 +151,9 @@ const TableList = () => {
     }
   }, []);
 
-  const handleReload = useCallback(() => {
-    console.log('点击刷新按钮');
+  const handleReload = () => {
     getPatients();
-  }, []);
+  };
 
   useEffect(() => {
     getPatients();
@@ -167,7 +167,6 @@ const TableList = () => {
         actionRef={actionRef}
         dataSource={patientData}
         rowKey="id"
-        search={false}
         pagination={{
           pageSize: 5,
         }}

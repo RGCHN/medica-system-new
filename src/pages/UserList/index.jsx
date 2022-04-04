@@ -127,6 +127,7 @@ const UserList = () => {
         value={userData}
         onChange={setUserData}
         recordCreatorProps={false}
+        search={true}
         editable={{
           type: 'single',
           editableKeys,
