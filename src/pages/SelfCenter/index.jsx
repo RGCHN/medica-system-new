@@ -90,7 +90,7 @@ const SelfCenter = () => {
               <ProFormText.Password width="md" name="password" label="密码" />
             </ProForm>
           </ProCard>
-          <Button type="primary">修改信息</Button>
+          {/*<Button type="primary">修改信息</Button>*/}
         </ProCard>
       )}
     </PageContainer>

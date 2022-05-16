@@ -4,12 +4,15 @@ import { useModel, useIntl } from 'umi';
 import ProTable from '@ant-design/pro-table';
 import { getPatientList } from '@/services/api';
 import AddPatient from '@/components/AddPatient';
-import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
-import { Button, message, Space } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import { Button, message, Space, Input } from 'antd';
 import { NavLink } from 'umi';
+
+const { Search } = Input;
 
 const TableList = () => {
   const [patientData, setPatientData] = useState([]);
+  const [fullData, setFullData] = useState([]);
   const { setPatientID, setCurrentPatient } = useModel('patient');
   const actionRef = useRef();
   const intl = useIntl();
@@ -137,10 +140,12 @@ const TableList = () => {
       const status = res.data.status;
       if (status === 'success') {
         setPatientData(res.data.data.patientList);
+        setFullData(res.data.data.patientList);
         return;
       }
       message.error(res.data.msg);
       setPatientData([]);
+      setFullData([]);
     } catch (error) {
       setPatientData([]);
       const defaultLoginFailureMessage = intl.formatMessage({
@@ -153,6 +158,18 @@ const TableList = () => {
 
   const handleReload = () => {
     getPatients();
+  };
+
+  const onSearch = (name) => {
+    if (fullData.length === 0) {
+      return;
+    }
+    if (!name) {
+      setPatientData(fullData);
+    } else {
+      const list = fullData.filter((p) => p.name === name);
+      setPatientData(list);
+    }
   };
 
   useEffect(() => {
@@ -170,8 +187,16 @@ const TableList = () => {
         pagination={{
           pageSize: 5,
         }}
+        search={false}
         dateFormatter="string"
         toolBarRender={() => [
+          <Search
+            key="search"
+            placeholder="输入患者姓名"
+            enterButton="查询"
+            size="Large"
+            onSearch={onSearch}
+          />,
           <AddPatient
             key="add"
             finishCallback={handleReload}

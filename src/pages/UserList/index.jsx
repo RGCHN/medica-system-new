@@ -1,12 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { message } from 'antd';
+import { Button, message, Input } from 'antd';
 import { PageContainer } from '@ant-design/pro-layout';
 import { EditableProTable } from '@ant-design/pro-table';
 import { getUserList, updateRole, deleteUser } from '@/services/api';
 import { roleMap } from '@/pages/dataMap';
 import { useIntl } from 'umi';
+import AddPatient from '@/components/AddPatient';
+import { PlusOutlined } from '@ant-design/icons';
+
+const { Search } = Input;
+
 const UserList = () => {
   const [userData, setUserData] = useState([]);
+  const [fullData, setFullData] = useState([]);
   const [editableKeys, setEditableRowKeys] = useState([]);
   const intl = useIntl();
   const columns = [
@@ -75,6 +81,7 @@ const UserList = () => {
     });
     if (res.data.status === 'success') {
       setUserData(res.data.data.userInfo);
+      setFullData(res.data.data.userInfo);
       message.success(res.data.msg);
     } else {
       const defaultLoginFailureMessage = intl.formatMessage({
@@ -92,6 +99,7 @@ const UserList = () => {
     });
     if (res.data.status === 'success') {
       setUserData(res.data.data.userInfo);
+      setFullData(res.data.data.userInfo);
     } else {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'app.error.network',
@@ -106,14 +114,29 @@ const UserList = () => {
       const res = await getUserList();
       if (res.data.status === 'success') {
         setUserData(res.data.data.userInfo);
+        setFullData(res.data.data.userInfo);
         return;
       }
       message.error(res.data.msg);
       setUserData([]);
+      setFullData([]);
     } catch (e) {
       setUserData([]);
+      setFullData([]);
     }
   }, []);
+
+  const onSearch = (name) => {
+    if (fullData.length === 0) {
+      return;
+    }
+    if (!name) {
+      setUserData(fullData);
+    } else {
+      const list = fullData.filter((p) => p.name === name);
+      setUserData(list);
+    }
+  };
 
   useEffect(() => {
     getUsers();
@@ -127,7 +150,19 @@ const UserList = () => {
         value={userData}
         onChange={setUserData}
         recordCreatorProps={false}
-        search={true}
+        search={false}
+        toolBarRender={() => [
+          <Search
+            key="search"
+            placeholder="输入医生姓名"
+            enterButton="查询"
+            size="Large"
+            onSearch={onSearch}
+          />,
+          <Button key="refresh" type="primary" onClick={getUsers}>
+            刷新
+          </Button>,
+        ]}
         editable={{
           type: 'single',
           editableKeys,
